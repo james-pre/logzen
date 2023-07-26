@@ -2,6 +2,8 @@
 
 LogZen is a simple and flexible logging library for Node.js that provides easy-to-use logging functionality with customizable log levels and the ability to output logs to different streams and consoles.
 
+[Documentation](https://logzen.drvortex.dev)
+
 ## Installation
 
 You can install LogZen using npm:
