@@ -278,7 +278,7 @@ export class Logger extends EventEmitter {
 	 * @param message - The log message.
 	 */
 	log(message = ''): void {
-		this.send(message, LogLevel.INFO);
+		this.send(message, LogLevel.LOG);
 		this.emit('log');
 	}
 
