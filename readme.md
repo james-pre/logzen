@@ -32,18 +32,17 @@ logger.debug('This is a debug message.');
 ```
 
 ### Customizing Log Levels
-You can customize the log levels by setting the `attachGlobalConsole` option to `false` and manually attaching streams with specific log levels:
+You can customize the log levels by setting the `attachGlobalConsole` option to `false` and manually attaching the console with custom log levels:
 
 ```javascript
 import { Logger, LogLevel } from 'logzen';
 const logger = new Logger({ attachGlobalConsole: false });
 
-// Attach custom streams with specific log levels
-logger.attachStream(process.stdout, LogLevel.LOG, LogLevel.INFO);
-logger.attachStream(process.stderr, LogLevel.WARN, LogLevel.ERROR, LogLevel.DEBUG);
+// Attach console with custom log levels
+logger.attachConsole(console, LogLevel.WARN, LogLevel.ERROR);
 
-logger.log('This log message will be written to stdout.');
-logger.debug('This message will be written to stderr instead of stdout!');
+logger.error('This message will be sent to the console.');
+logger.log('This message will not be sent to the console!');
 ```
 
 ### Logging to Files
