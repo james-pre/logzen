@@ -1,0 +1,26 @@
+{
+	"compilerOptions": {
+		"lib": ["ESNext"],
+		"module": "ESNext",
+		"target": "ESNext",
+		"moduleResolution": "node",
+		"outDir": "dist",
+		"typeRoots": ["node_modules/@types", "src/typings"],
+		"types": ["node", "jest"],
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
+		"noImplicitThis": true,
+		"declaration": true,
+	},
+	"files": ["src/index.ts"],
+	"ts-node": {
+		"esm": true,
+		"experimentalSpecifierResolution": "node"
+	},
+	"typedocOptions": {
+        "entryPoints": ["src/index.ts"],
+        "out": "docs",
+    },
+	"include": ["src/**/*.ts", "scripts/*.ts"],
+	"exclude": ["node_modules"]
+}
