@@ -4,6 +4,7 @@ import pkg from '../package.json' assert { type: 'json' };
 const commonConfig = {
 	entryPoints: ['src/index.ts'],
 	define: { $pkg: JSON.stringify(pkg) },
+	globalName: 'LogZen',
 };
 
 //browser minifed

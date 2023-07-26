@@ -230,7 +230,7 @@ export class Logger extends EventEmitter {
 	 * @param message - The log message to be sent.
 	 * @param level - The log level for the message. Defaults to LogLevel.LOG.
 	 */
-	send(message: string, level: LogLevel = LogLevel.LOG): void {
+	send(message = '', level: LogLevel = LogLevel.LOG): void {
 		const logEntry = computeLogMessage(message, level);
 		if (this.options.retainLogs) {
 			this._entries.push(logEntry);
@@ -245,7 +245,7 @@ export class Logger extends EventEmitter {
 		for (const console of this.consoles) {
 			const method = LogLevel[level].toLowerCase();
 			if (console.levels.includes(level) && typeof console.io[method] == 'function') {
-				console.io[method](message);
+				console.io[method](logEntry);
 			}
 		}
 	}
@@ -277,7 +277,7 @@ export class Logger extends EventEmitter {
 	 * Logs a message with the LogLevel.LOG level.
 	 * @param message - The log message.
 	 */
-	log(message: string): void {
+	log(message = ''): void {
 		this.send(message, LogLevel.INFO);
 		this.emit('log');
 	}
@@ -286,7 +286,7 @@ export class Logger extends EventEmitter {
 	 * Logs a info message with the LogLevel.INFO level.
 	 * @param message - The log message.
 	 */
-	info(message: string): void {
+	info(message = ''): void {
 		this.send(message, LogLevel.INFO);
 		this.emit('info');
 	}
@@ -295,7 +295,7 @@ export class Logger extends EventEmitter {
 	 * Logs a warning message with the LogLevel.WARN level.
 	 * @param errorOrMessage - The error or log message.
 	 */
-	warn(errorOrMessage: Error | string): void {
+	warn(errorOrMessage: Error | string = ''): void {
 		const message = errorOrMessage.toString();
 		this.send(message, LogLevel.WARN);
 		this.emit('warn');
@@ -305,7 +305,7 @@ export class Logger extends EventEmitter {
 	 * Logs an error message with the LogLevel.ERROR level.
 	 * @param errorOrMessage - The error or log message.
 	 */
-	error(errorOrMessage: Error | string): void {
+	error(errorOrMessage: Error | string = ''): void {
 		const message = errorOrMessage.toString();
 		this.send(message, LogLevel.ERROR);
 		this.emit('error');
@@ -315,7 +315,7 @@ export class Logger extends EventEmitter {
 	 * Logs a debug message with the LogLevel.DEBUG level.
 	 * @param message - The log message.
 	 */
-	debug(message: string): void {
+	debug(message = ''): void {
 		this.send(message, LogLevel.DEBUG);
 		this.emit('debug');
 	}
