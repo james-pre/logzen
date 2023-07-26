@@ -1,5 +1,5 @@
 import EventEmitter from 'eventemitter3';
-import { Duplex, Readable, Transform, Writable } from 'stream';
+import type { Readable, Writable } from 'stream';
 
 /**
  * Enumeration of log levels.
@@ -42,7 +42,7 @@ function computeLogMessage(message: string, level: LogLevel = LogLevel.LOG): str
 /**
  * Type for streams that can be used with Logger
  */
-export type LogStream = Readable | Writable | Duplex | Transform;
+export type LogStream = Readable | Writable;
 
 /**
  * Interface for storing log I/O and associated log levels.
@@ -132,7 +132,7 @@ export class Logger extends EventEmitter {
 	 */
 	attachStream(stream: LogStream, ...levels: LogLevel[]): void {
 		levels = levels.length ? levels : allLogLevels;
-		if (!(stream instanceof Readable || stream instanceof Writable)) {
+		if (!('read' in stream || 'write' in stream)) {
 			throw new TypeError('Stream must be a Readable or Writable.');
 		}
 
@@ -146,7 +146,7 @@ export class Logger extends EventEmitter {
 		const container: LogIO<LogStream> = { io: stream, levels };
 		this.streams.add(container);
 
-		if (stream instanceof Readable) {
+		if ('read' in stream) {
 			stream.on('data', (data: Buffer | string) => {
 				this.send(data.toString().trim(), levels[0] || LogLevel.LOG);
 			});
@@ -172,7 +172,7 @@ export class Logger extends EventEmitter {
 
 		if (container.levels.length == 0 || levels.length == 0) {
 			this.streams.delete(container);
-			if (stream instanceof Readable) {
+			if ('read' in stream) {
 				stream.removeAllListeners('data');
 			}
 		}
