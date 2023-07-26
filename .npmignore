@@ -1,4 +1,8 @@
-.*
+.github
+.eslintrc.json
+.gitignore
+.npmignore
+.prettierrc
 docs
 node_modules
 scripts
