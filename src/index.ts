@@ -35,7 +35,7 @@ function getTimeString(time: number): string {
  * Computes the log message with the timestamp and log level.
  * @param message The log message to be formatted.
  * @param level The log level for the message. Defaults to LogLevel.LOG.
- * @param format The message format to use 
+ * @param format The message format to use
  * @returns The formatted log message.
  */
 function computeLogMessage(message: string, level: LogLevel = LogLevel.LOG, format = '($time) [$level] $message'): string {
