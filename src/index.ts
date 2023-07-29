@@ -1,5 +1,6 @@
 import EventEmitter from 'eventemitter3';
 import type { Readable, Writable } from 'stream';
+export { version } from '../package.json';
 
 /**
  * Enumeration of log levels.
@@ -12,7 +13,10 @@ export enum LogLevel {
 	DEBUG = 4,
 }
 
-const allLogLevels = Object.values(LogLevel).filter(value => typeof value === 'number') as LogLevel[];
+/**
+ * An array of all the log levels
+ */
+export const allLogLevels = Object.values(LogLevel).filter(value => typeof value == 'number') as LogLevel[];
 
 /**
  * Helper function to get a formatted time string from a timestamp.
@@ -29,14 +33,18 @@ function getTimeString(time: number): string {
 
 /**
  * Computes the log message with the timestamp and log level.
- * @param message - The log message to be formatted.
- * @param level - The log level for the message. Defaults to LogLevel.LOG.
+ * @param message The log message to be formatted.
+ * @param level The log level for the message. Defaults to LogLevel.LOG.
+ * @param format The message format to use 
  * @returns The formatted log message.
  */
-function computeLogMessage(message: string, level: LogLevel = LogLevel.LOG): string {
-	const timeString = getTimeString(performance.now());
-	const logLevel = LogLevel[level];
-	return `(${timeString}) [${logLevel}] ${message}`;
+function computeLogMessage(message: string, level: LogLevel = LogLevel.LOG, format = '($time) [$level] $message'): string {
+	const variables: Map<string, string> = new Map([
+		['time', getTimeString(performance.now())],
+		['level', LogLevel[level]],
+		['message', message],
+	]);
+	return format.replaceAll(/\$([\w_]+)/g, (text, key) => (variables.has(key) ? variables.get(key) : text));
 }
 
 /**
@@ -80,6 +88,16 @@ export interface LoggerOptions {
 	 * @default true
 	 */
 	allowClearing: boolean;
+
+	/**
+	 * The format to use for log messages
+	 * Variables:
+	 * 	$time: The time since the program started in hh:mm:ss
+	 * 	$level: The log level as a string
+	 * 	$message: The message
+	 * @default '($time) [$level] $message'
+	 */
+	logFormat: string;
 }
 
 export class Logger extends EventEmitter {
@@ -87,13 +105,14 @@ export class Logger extends EventEmitter {
 	private readonly streams: Set<LogIO<LogStream>> = new Set();
 	private readonly consoles: Set<LogIO<Console>> = new Set();
 	private options: LoggerOptions;
-	constructor({ attachGlobalConsole = true, retainLogs = true, allowClearing = true }: Partial<LoggerOptions> = {}) {
+	constructor({ attachGlobalConsole = true, retainLogs = true, allowClearing = true, logFormat = '($time) [$level] $message' }: Partial<LoggerOptions> = {}) {
 		super();
 
 		this.options = {
 			attachGlobalConsole,
 			retainLogs,
 			allowClearing,
+			logFormat,
 		};
 
 		if (this.options.attachGlobalConsole && 'console' in globalThis) {
@@ -231,7 +250,7 @@ export class Logger extends EventEmitter {
 	 * @param level - The log level for the message. Defaults to LogLevel.LOG.
 	 */
 	send(message = '', level: LogLevel = LogLevel.LOG): void {
-		const logEntry = computeLogMessage(message, level);
+		const logEntry = computeLogMessage(message, level, this.options.logFormat);
 		if (this.options.retainLogs) {
 			this._entries.push(logEntry);
 		}
