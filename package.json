@@ -28,10 +28,6 @@
 		"url": "https://github.com/dr-vortex/logzen/issues"
 	},
 	"homepage": "https://github.com/dr-vortex/logzen#readme",
-	"browser": {
-		"stream": "readable-stream",
-		"events": "eventemitter3"
-	},
 	"devDependencies": {
 		"@types/jest": "^29.5.3",
 		"@types/node": "^20.4.5",
