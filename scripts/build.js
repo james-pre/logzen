@@ -19,6 +19,7 @@ const commonConfig = {
 	entryPoints: ['src/index.ts'],
 	define: { $pkg: JSON.stringify(pkg) },
 	globalName: 'Logzen',
+	sourcemap: true,
 };
 
 const contexts = [
