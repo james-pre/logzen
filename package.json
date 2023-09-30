@@ -2,17 +2,17 @@
 	"name": "logzen",
 	"version": "0.1.1",
 	"description": "An easy to use utility for logging",
-	"main": "dist/node/index.js",
+	"main": "dist/logzen.min.js",
 	"types": "dist/index.d.ts",
 	"type": "module",
 	"scripts": {
-		"format:check": "prettier --check {src,test,build}/**/*.ts",
-		"format:fix": "prettier --write {src,test,build}/**/*.ts",
-		"format": "npm run format:check && npm run format:fix",
-		"lint": "eslint {src,test,build}/**/*.ts && tsc --noEmit",
-		"build": "node scripts/build.js && tsc --emitDeclarationOnly && npm run build:docs",
+		"format:check": "prettier --check . --ignore-path .gitignore",
+		"format": "prettier --write . --ignore-path .gitignore",
+		"lint": "eslint src && tsc --noEmit",
+		"build": "node scripts/build.js && tsc --project tsconfig.json --emitDeclarationOnly",
 		"build:docs": "typedoc src/index.ts --out docs",
-		"test": "jest"
+		"test": "jest",
+		"prepublishOnly": "npm run format && npm run lint && npm run build"
 	},
 	"repository": {
 		"type": "git",

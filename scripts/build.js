@@ -1,33 +1,63 @@
-import { build } from 'esbuild';
+/* eslint-env node */
+import { context } from 'esbuild';
 import pkg from '../package.json' assert { type: 'json' };
+import { parseArgs } from 'node:util';
+import { rmSync } from 'node:fs';
+
+const { values: options } = parseArgs({
+	options: {
+		watch: { short: 'w', type: 'boolean', default: false },
+		keep: { short: 'k', type: 'boolean', default: false },
+	},
+});
+
+if (!options.keep) {
+	rmSync('dist', { recursive: true, force: true });
+}
 
 const commonConfig = {
 	entryPoints: ['src/index.ts'],
 	define: { $pkg: JSON.stringify(pkg) },
-	globalName: 'LogZen',
+	globalName: 'Logzen',
 };
 
-//browser minifed
-await build({
-	...commonConfig,
-	outfile: 'dist/logzen.min.js',
-	platform: 'browser',
-	bundle: true,
-	minify: true,
-});
+const contexts = [
+	await context({
+		...commonConfig,
+		outfile: `dist/${pkg.name}.min.js`,
+		format: 'esm',
+		platform: 'neutral',
+		bundle: true,
+		minify: true,
+	}),
 
-//browser unminifed
-await build({
-	...commonConfig,
-	outfile: 'dist/logzen.js',
-	platform: 'browser',
-	bundle: true,
-});
+	await context({
+		...commonConfig,
+		outfile: `dist/${pkg.name}.js`,
+		format: 'esm',
+		platform: 'neutral',
+		bundle: true,
+	}),
 
-//node
-await build({
-	...commonConfig,
-	outdir: 'dist/node',
-	platform: 'node',
-	bundle: false,
-});
+	await context({
+		...commonConfig,
+		outfile: `dist/${pkg.name}.browser.js`,
+		platform: 'browser',
+		bundle: true,
+		minify: true,
+	}),
+];
+
+const promises = [];
+for (const ctx of contexts) {
+	if (options.watch) {
+		promises.push(ctx.watch());
+	} else {
+		await ctx.rebuild();
+		await ctx.dispose();
+	}
+}
+if (options.watch) {
+	console.log('Watching...');
+	await Promise.all(promises);
+}

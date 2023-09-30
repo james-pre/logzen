@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import type { Readable, Writable } from 'stream';
-export { version } from '../package.json';
+
+export const version = $pkg.version;
 
 /**
  * Enumeration of log levels.
@@ -101,10 +102,10 @@ export interface LoggerOptions {
 }
 
 export class Logger extends EventEmitter {
-	private _entries: string[] = [];
-	private readonly streams: Set<LogIO<LogStream>> = new Set();
-	private readonly consoles: Set<LogIO<Console>> = new Set();
-	private options: LoggerOptions;
+	protected _entries: string[] = [];
+	protected readonly streams: Set<LogIO<LogStream>> = new Set();
+	protected readonly consoles: Set<LogIO<Console>> = new Set();
+	protected options: LoggerOptions;
 	constructor({ attachGlobalConsole = true, retainLogs = true, allowClearing = true, logFormat = '($time) [$level] $message' }: Partial<LoggerOptions> = {}) {
 		super();
 
@@ -149,7 +150,7 @@ export class Logger extends EventEmitter {
 	 * @param stream - The stream to attach.
 	 * @param levels - The log levels for the stream. If not provided, all log levels will be attached.
 	 */
-	attachStream(stream: LogStream, ...levels: LogLevel[]): void {
+	public attachStream(stream: LogStream, ...levels: LogLevel[]): void {
 		levels = levels.length ? levels : allLogLevels;
 		if (!('read' in stream || 'write' in stream)) {
 			throw new TypeError('Stream must be a Readable or Writable.');
@@ -177,7 +178,7 @@ export class Logger extends EventEmitter {
 	 * @param stream - The stream to detach.
 	 * @param levels - The log levels to detach from the stream. If not provided, all log levels will be detached.
 	 */
-	detachStream(stream: LogStream, ...levels: LogLevel[]): void {
+	public detachStream(stream: LogStream, ...levels: LogLevel[]): void {
 		const container = Array.from(this.streams).find(container => container.io === stream);
 
 		if (!container) return;
@@ -202,7 +203,7 @@ export class Logger extends EventEmitter {
 	 * @param console - The Console object to attach.
 	 * @param levels - The log levels for the console. If not provided, all log levels will be attached.
 	 */
-	attachConsole(console: Console, ...levels: LogLevel[]): void {
+	public attachConsole(console: Console, ...levels: LogLevel[]): void {
 		levels = levels.length ? levels : allLogLevels;
 		const existingContainer = Array.from(this.consoles).find(container => container.io === console);
 
@@ -219,7 +220,7 @@ export class Logger extends EventEmitter {
 	 * @param console - The Console object to detach.
 	 * @param levels - The log levels to detach from the console. If not provided, all log levels will be detached.
 	 */
-	detachConsole(console: Console, ...levels: LogLevel[]): void {
+	public detachConsole(console: Console, ...levels: LogLevel[]): void {
 		const container = Array.from(this.consoles).find(container => container.io === console);
 
 		if (!container) return;
@@ -239,7 +240,7 @@ export class Logger extends EventEmitter {
 	/**
 	 * Detaches all streams and consoles
 	 */
-	detachAll(): void {
+	public detachAll(): void {
 		this.streams.clear();
 		this.consoles.clear();
 	}
@@ -249,7 +250,7 @@ export class Logger extends EventEmitter {
 	 * @param message - The log message to be sent.
 	 * @param level - The log level for the message. Defaults to LogLevel.LOG.
 	 */
-	send(message = '', level: LogLevel = LogLevel.LOG): void {
+	public send(message = '', level: LogLevel = LogLevel.LOG): void {
 		const logEntry = computeLogMessage(message, level, this.options.logFormat);
 		if (this.options.retainLogs) {
 			this._entries.push(logEntry);
@@ -273,7 +274,7 @@ export class Logger extends EventEmitter {
 	 * Converts the log entries to a string.
 	 * @returns A string representation of the log entries.
 	 */
-	toString(): string {
+	public toString(): string {
 		return this.entries.join('\n');
 	}
 
@@ -281,7 +282,7 @@ export class Logger extends EventEmitter {
 	 *
 	 * @returns whether the entries where cleared or not
 	 */
-	clearRetainedEntries(): boolean {
+	public clearRetainedEntries(): boolean {
 		if (!this.options.retainLogs || !this.options.allowClearing) {
 			return false;
 		}
@@ -296,7 +297,7 @@ export class Logger extends EventEmitter {
 	 * Logs a message with the LogLevel.LOG level.
 	 * @param message - The log message.
 	 */
-	log(message = ''): void {
+	public log(message = ''): void {
 		this.send(message, LogLevel.LOG);
 		this.emit('log');
 	}
@@ -305,7 +306,7 @@ export class Logger extends EventEmitter {
 	 * Logs a info message with the LogLevel.INFO level.
 	 * @param message - The log message.
 	 */
-	info(message = ''): void {
+	public info(message = ''): void {
 		this.send(message, LogLevel.INFO);
 		this.emit('info');
 	}
@@ -314,7 +315,7 @@ export class Logger extends EventEmitter {
 	 * Logs a warning message with the LogLevel.WARN level.
 	 * @param errorOrMessage - The error or log message.
 	 */
-	warn(errorOrMessage: Error | string = ''): void {
+	public warn(errorOrMessage: Error | string = ''): void {
 		const message = errorOrMessage.toString();
 		this.send(message, LogLevel.WARN);
 		this.emit('warn');
@@ -324,7 +325,7 @@ export class Logger extends EventEmitter {
 	 * Logs an error message with the LogLevel.ERROR level.
 	 * @param errorOrMessage - The error or log message.
 	 */
-	error(errorOrMessage: Error | string = ''): void {
+	public error(errorOrMessage: Error | string = ''): void {
 		const message = errorOrMessage.toString();
 		this.send(message, LogLevel.ERROR);
 		this.emit('error');
@@ -334,7 +335,7 @@ export class Logger extends EventEmitter {
 	 * Logs a debug message with the LogLevel.DEBUG level.
 	 * @param message - The log message.
 	 */
-	debug(message = ''): void {
+	public debug(message = ''): void {
 		this.send(message, LogLevel.DEBUG);
 		this.emit('debug');
 	}
