@@ -268,6 +268,7 @@ export class Logger extends EventEmitter {
 				console.io[method](logEntry);
 			}
 		}
+		this.emit('message', message, level);
 	}
 
 	/**
