@@ -40,9 +40,8 @@ jobs:
             - name: Linting
               run: npm run lint
 
-            # Once tests are working
-            #-name: Test
-            # run: npm run test
+            - name: Test
+              run: npm run test
 
             - name: Build
               run: npm run build
