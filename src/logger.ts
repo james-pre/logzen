@@ -165,7 +165,7 @@ export class Logger extends EventEmitter<{
 	 * @param level The log level for the message. Defaults to LogLevel.LOG.
 	 * @param _computed Whether the log message is already computed
 	 */
-	public send(message: string, level: LogLevel = LogLevel.LOG, _computed: boolean = false): void {
+	public send(message: string, level: LogLevel = LogLevel.LOG, _computed = false): void {
 		const data = _computed ? message : computeLogMessage(message, level, this.options.logFormat);
 		if (this.options.retainLogs) {
 			this._entries.push(data);
@@ -179,6 +179,7 @@ export class Logger extends EventEmitter<{
 			if (!(type in interfaces)) {
 				throw new TypeError('Invalid I/O type: ' + type);
 			}
+			// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 			interfaces[type].send(io as any, { data, level, computed: true });
 		}
 

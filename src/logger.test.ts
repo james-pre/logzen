@@ -36,7 +36,7 @@ describe('Logger', () => {
 		const mockIO: IO<Writable> = {
 			io: {
 				write: jest.fn(),
-			} as any,
+			} as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
 			input: { levels: new Set([LogLevel.INFO]), enabled: false },
 			output: { levels: new Set([LogLevel.INFO]), enabled: true },
 			type: 'Writable',

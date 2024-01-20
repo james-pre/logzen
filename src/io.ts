@@ -128,7 +128,7 @@ export const interfaces: { [N in SupportedInterfaceName]: IOInterface<SupportedI
 	},
 	ReadableStream: {
 		async receive(io, handler) {
-			let data: string = '';
+			let data = '';
 			for await (const chunk of io) {
 				data += chunk;
 			}

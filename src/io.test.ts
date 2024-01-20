@@ -7,7 +7,7 @@ import { Logger } from './logger';
 const _interfaces: SupportedInterfaces = {
 	Readable: new Readable({
 		read(size) {
-			return true;
+			return typeof size == 'number';
 		},
 	}),
 	Writable: new Writable({
