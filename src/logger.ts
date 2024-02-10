@@ -66,7 +66,7 @@ export class Logger extends EventEmitter<{
 			allowClearing,
 			format,
 			formatOptions,
-			prefix, 
+			prefix,
 		};
 
 		if (this.options.attachGlobalConsole && 'console' in globalThis) {
@@ -199,7 +199,7 @@ export class Logger extends EventEmitter<{
 			message = {
 				contents: message,
 				level,
-				prefix: this.options.prefix
+				prefix: this.options.prefix,
 			};
 		}
 		message.computed ||= formatMessage(message, this.options.format, this.options.formatOptions);
