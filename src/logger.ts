@@ -28,11 +28,8 @@ export interface LoggerOptions {
 
 	/**
 	 * The format to use for log messages
-	 * Variables:
-	 * 	$time: The time since the program started in hh:mm:ss
-	 * 	$level: The log level as a string
-	 * 	$message: The message
-	 * @default '($time) [$level] $message'
+	 * @see computeLogMessage
+	 * @default '($time) [$prefix$level] $message'
 	 */
 	logFormat: string;
 }
@@ -44,13 +41,12 @@ export class Logger extends EventEmitter<{
 	warn: (data: string | Error) => void;
 	error: (data: string | Error) => void;
 	debug: (data: string) => void;
-	beforesend: (data: IOMessage) => void;
 	send: (data: IOMessage) => void;
 }> {
 	protected _entries: string[] = [];
 	protected readonly io: Set<IO<SupportedInterface>> = new Set();
 	protected options: LoggerOptions;
-	constructor({ attachGlobalConsole = true, retainLogs = true, allowClearing = true, logFormat = '($time) [$level] $message' }: Partial<LoggerOptions> = {}) {
+	constructor({ attachGlobalConsole = true, retainLogs = true, allowClearing = true, logFormat = '($time) [$prefix$level] $message' }: Partial<LoggerOptions> = {}) {
 		super();
 
 		this.options = {
@@ -89,12 +85,13 @@ export class Logger extends EventEmitter<{
 	 * @param outputLevels The log levels to use from the i/o
 	 * If log levels are not provided, all log levels will be attached.
 	 */
-	public attach(io: Logger, inputLevels: LogLevel[], outputLevels: LogLevel[]): void;
-	public attach<I extends SupportedInterface>(io: I, levels?: LogLevel[]): void;
+	public attach(io: Logger, inputLevels: LogLevel[], outputLevels: LogLevel[], prefix?: string): void;
+	public attach<I extends SupportedInterface>(io: I, levels?: LogLevel[], prefix?: string): void;
 	public attach<I extends SupportedInterface>(io: IO<I>): void;
-	public attach<I extends SupportedInterface>(_io: IO<I> | I, inputLevels: LogLevel[] = allLogLevels, outputLevels?: LogLevel[]): void {
+	public attach<I extends SupportedInterface>(_io: IO<I> | I, inputLevels: LogLevel[] = allLogLevels, outputLevels?: LogLevel[] | string, prefix?: string): void {
 		inputLevels = inputLevels instanceof Array ? inputLevels : allLogLevels;
 		outputLevels = outputLevels instanceof Array ? outputLevels : inputLevels;
+		prefix = typeof outputLevels == 'string' ? outputLevels : prefix;
 		const io = isIO(_io) ? _io.io : _io;
 		const type = ('io' in _io && 'type' in _io ? _io.type : _io instanceof globalThis.console.constructor ? 'Console' : _io.constructor.name) as SupportedInterfaceName;
 		if (!(type in interfaces)) {
@@ -108,11 +105,15 @@ export class Logger extends EventEmitter<{
 			for (const level of outputLevels) {
 				existing.output.levels.add(level);
 			}
+			if (prefix) {
+				existing.prefix = prefix;
+			}
 			return;
 		}
 		this.io.add({
 			io,
 			type,
+			prefix,
 			input: {
 				levels: new Set(inputLevels),
 				enabled: typeof interfaces[type].receive == 'function',
@@ -163,19 +164,36 @@ export class Logger extends EventEmitter<{
 
 	/**
 	 * Outputs a log message to attached outputs.
-	 * @param message The log message to be sent.
+	 * @param contents The log message to be sent.
 	 * @param level The log level for the message. Defaults to LogLevel.LOG.
 	 * @param computed Whether the log message is already computed
 	 */
-	public send(message: string, level: LogLevel = LogLevel.LOG, computed = false): void {
-		this.emit('beforesend', { data: message, level, computed });
-		const data = computed ? message : computeLogMessage(message, level, this.options.logFormat);
+	public send(contents: string, level: LogLevel): void;
+
+	/**
+	 * Outputs a log message to attached outputs.
+	 * @param message The message
+	 */
+	public send(message: IOMessage): void;
+
+	/**
+	 * Outputs a log message to attached outputs.
+	 * @param message The log message to be sent. Can be an object with the message details or string with the message contents.
+	 * @param level The log level for the message. Defaults to LogLevel.LOG.
+	 */
+	public send(message: string | IOMessage, level: LogLevel = LogLevel.LOG): void {
+		if (typeof message == 'string') {
+			message = {
+				contents: message,
+				level,
+			};
+		}
+		message.computed ||= computeLogMessage(message, this.options.logFormat);
 		if (this.options.retainLogs) {
-			this._entries.push(data);
+			this._entries.push(message.computed);
 		}
 
-		const computedMessage: IOMessage = { data, level, computed: true };
-		for (const { io, output, type } of this.io) {
+		for (const { io, output, type, prefix } of this.io) {
 			if (!output.enabled || !output.levels.has(level)) {
 				continue;
 			}
@@ -184,10 +202,10 @@ export class Logger extends EventEmitter<{
 				throw new TypeError('Invalid I/O type: ' + type);
 			}
 			// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-			interfaces[type].send(io as any, computedMessage);
+			interfaces[type].send(io as any, { ...message, prefix });
 		}
-		this.emit('send', computedMessage);
-		this.emit('entry', data, level);
+		this.emit('send', message);
+		this.emit('entry', message.computed, level);
 	}
 
 	/**
@@ -196,14 +214,14 @@ export class Logger extends EventEmitter<{
 	 * @returns whether the message was sent
 	 * This is used to recieve data from inputs
 	 */
-	protected _send({ data, level, computed }: IOMessage): boolean {
+	/*protected _send(message: IOMessage): boolean {
 		try {
-			this.send(data, level, computed);
+			this.send(message);
 			return true;
 		} catch (e) {
 			return false;
 		}
-	}
+	}*/
 
 	/**
 	 * Converts the log entries to a string.

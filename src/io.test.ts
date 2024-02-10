@@ -48,7 +48,7 @@ describe('IO', () => {
 
 		if (typeof ioInterface.send == 'function') {
 			test(`${interfaceName}.send()`, () => {
-				const result = ioInterface.send(ioInstance, { data: 'test', level: LogLevel.LOG, computed: true });
+				const result = ioInterface.send(ioInstance, { contents: 'test', level: LogLevel.LOG, computed: 'test' });
 				expect(result).toBe(true);
 			});
 		}

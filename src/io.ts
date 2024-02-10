@@ -6,21 +6,26 @@ import { Logger } from './logger';
 /**
  * For sending messages between interfaces and loggers
  */
-export interface IOMessage<Computed extends boolean = boolean> {
+export interface IOMessage {
 	/**
 	 * The message contents
 	 */
-	data: string;
+	contents: string;
 
 	/**
-	 * Whether data is the contents or the computed log entry
+	 * If the message has already been computed, this will contain the computed message
 	 */
-	computed: Computed;
+	computed?: string;
 
 	/**
 	 * The log level of the message
 	 */
-	level?: Computed extends true ? LogLevel : never;
+	level?: LogLevel;
+
+	/**
+	 * The prefix to add to the message
+	 */
+	prefix?: string;
 }
 
 /**
@@ -61,6 +66,11 @@ export interface IO<I extends SupportedInterface = SupportedInterface> {
 	 * The type of interface
 	 */
 	type: NameOfInterface<I>;
+
+	/**
+	 * An optional prefix to add to messages
+	 */
+	prefix?: string;
 }
 
 /**
@@ -112,14 +122,14 @@ export const interfaces: { [N in SupportedInterfaceName]: IOInterface<SupportedI
 	Readable: {
 		receive(io, handler) {
 			io.on('data', (data: Buffer | string) => {
-				handler({ computed: false, data: data.toString().trim() });
+				handler({ contents: data.toString().trim() });
 			});
 		},
 	},
 	Writable: {
-		send(io, { data }) {
+		send(io, { computed }) {
 			try {
-				io.write(data);
+				io.write(computed);
 				return true;
 			} catch (e) {
 				return false;
@@ -132,13 +142,13 @@ export const interfaces: { [N in SupportedInterfaceName]: IOInterface<SupportedI
 			for await (const chunk of io) {
 				data += chunk;
 			}
-			handler({ computed: false, data });
+			handler({ contents: data });
 		},
 	},
 	WritableStream: {
-		send(io, { data }) {
+		send(io, { computed }) {
 			try {
-				io.getWriter().write(data);
+				io.getWriter().write(computed);
 				return true;
 			} catch (e) {
 				return false;
@@ -146,11 +156,11 @@ export const interfaces: { [N in SupportedInterfaceName]: IOInterface<SupportedI
 		},
 	},
 	Console: {
-		send(io, { data, level }) {
+		send(io, { computed, level }) {
 			try {
 				const method = LogLevel[level].toLowerCase();
 				if (typeof io[method] == 'function') {
-					io[method](data);
+					io[method](computed);
 				}
 				return true;
 			} catch (e) {
@@ -159,17 +169,17 @@ export const interfaces: { [N in SupportedInterfaceName]: IOInterface<SupportedI
 		},
 	},
 	Logger: {
-		send(io, { data, level }) {
+		send(io, message) {
 			try {
-				io.send(data, level, true);
+				io.send(message);
 				return true;
 			} catch (e) {
 				return false;
 			}
 		},
 		receive(io, handler) {
-			io.on('entry', (data, level) => {
-				handler({ data, level, computed: true });
+			io.on('send', message => {
+				handler(message);
 			});
 		},
 	},

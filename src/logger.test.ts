@@ -44,13 +44,54 @@ describe('Logger', () => {
 
 		logger.attach(mockIO);
 
-		const message = 'Test log message';
-		logger.send(message, LogLevel.INFO);
+		const contents = 'Test log message';
+		logger.send(contents, LogLevel.INFO);
 
-		const expected = computeLogMessage(message, LogLevel.INFO);
+		const expected = computeLogMessage({ contents, level: LogLevel.INFO });
 
 		expect(mockIO.io.write).toHaveBeenCalledWith(expected);
 		expect(logger.entries).toContain(expected);
+	});
+
+	test('Send log message with prefix', () => {
+		const mockIO: IO<Writable> = {
+			io: {
+				write: jest.fn(),
+			} as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
+			input: { levels: new Set([LogLevel.INFO]), enabled: false },
+			output: { levels: new Set([LogLevel.INFO]), enabled: true },
+			type: 'Writable',
+		};
+
+		logger.attach(mockIO);
+
+		const message = { contents: 'Test log message', level: LogLevel.INFO, prefix: 'PREFIX' };
+
+		// Test sending log messages with a prefix
+		logger.send(message);
+
+		// Validate that the write method of the mock IO was called with the correct message including prefix
+		const expected = computeLogMessage(message);
+		expect(mockIO.io.write).toHaveBeenCalledWith(expected);
+
+		// Validate that the log message with prefix was recorded in the logger's entries
+		expect(logger.entries).toContain(expected);
+	});
+
+	test('Logger to Logger testing', () => {
+		const receiverLogger = new Logger({ attachGlobalConsole: false });
+
+		// Attach the receiver logger as an output to the sender logger
+		logger.attach(receiverLogger);
+
+		const contents = 'Test log message';
+
+		// Send a log message from the sender logger
+		logger.send(contents, LogLevel.INFO);
+
+		// Validate that the log message was received by the receiver logger
+		const expected = computeLogMessage({ contents, level: LogLevel.INFO });
+		expect(receiverLogger.entries).toContain(expected);
 	});
 
 	test('Clear retained log entries', () => {
@@ -65,22 +106,22 @@ describe('Logger', () => {
 	});
 
 	test('Shortcut methods', () => {
-		const logMessage = 'Test log message';
+		const contents = 'Test log message';
 
-		logger.log(logMessage);
-		expect(logger.entries).toContain(computeLogMessage(logMessage, LogLevel.LOG));
+		logger.log(contents);
+		expect(logger.entries).toContain(computeLogMessage({ contents, level: LogLevel.LOG }));
 
-		logger.info(logMessage);
-		expect(logger.entries).toContain(computeLogMessage(logMessage, LogLevel.INFO));
+		logger.info(contents);
+		expect(logger.entries).toContain(computeLogMessage({ contents, level: LogLevel.INFO }));
 
-		const logError = new Error(logMessage);
-		logger.warn(logError);
-		expect(logger.entries).toContain(computeLogMessage(logError.toString(), LogLevel.WARN));
+		const errorContents = new Error(contents);
+		logger.warn(errorContents);
+		expect(logger.entries).toContain(computeLogMessage({ contents: errorContents.toString(), level: LogLevel.WARN }));
 
-		logger.error(logError);
-		expect(logger.entries).toContain(computeLogMessage(logError.toString(), LogLevel.ERROR));
+		logger.error(errorContents);
+		expect(logger.entries).toContain(computeLogMessage({ contents: errorContents.toString(), level: LogLevel.ERROR }));
 
-		logger.debug(logMessage);
-		expect(logger.entries).toContain(computeLogMessage(logMessage, LogLevel.DEBUG));
+		logger.debug(contents);
+		expect(logger.entries).toContain(computeLogMessage({ contents, level: LogLevel.DEBUG }));
 	});
 });
