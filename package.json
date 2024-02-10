@@ -1,6 +1,6 @@
 {
 	"name": "logzen",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"description": "An easy to use utility for logging",
 	"main": "dist/logzen.min.js",
 	"types": "dist/index.d.ts",
