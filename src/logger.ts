@@ -44,6 +44,8 @@ export class Logger extends EventEmitter<{
 	warn: (data: string | Error) => void;
 	error: (data: string | Error) => void;
 	debug: (data: string) => void;
+	beforesend: (data: IOMessage) => void;
+	send: (data: IOMessage) => void;
 }> {
 	protected _entries: string[] = [];
 	protected readonly io: Set<IO<SupportedInterface>> = new Set();
@@ -163,14 +165,16 @@ export class Logger extends EventEmitter<{
 	 * Outputs a log message to attached outputs.
 	 * @param message The log message to be sent.
 	 * @param level The log level for the message. Defaults to LogLevel.LOG.
-	 * @param _computed Whether the log message is already computed
+	 * @param computed Whether the log message is already computed
 	 */
-	public send(message: string, level: LogLevel = LogLevel.LOG, _computed = false): void {
-		const data = _computed ? message : computeLogMessage(message, level, this.options.logFormat);
+	public send(message: string, level: LogLevel = LogLevel.LOG, computed = false): void {
+		this.emit('beforesend', { data: message, level, computed });
+		const data = computed ? message : computeLogMessage(message, level, this.options.logFormat);
 		if (this.options.retainLogs) {
 			this._entries.push(data);
 		}
 
+		const computedMessage: IOMessage = { data, level, computed: true };
 		for (const { io, output, type } of this.io) {
 			if (!output.enabled || !output.levels.has(level)) {
 				continue;
@@ -180,9 +184,9 @@ export class Logger extends EventEmitter<{
 				throw new TypeError('Invalid I/O type: ' + type);
 			}
 			// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-			interfaces[type].send(io as any, { data, level, computed: true });
+			interfaces[type].send(io as any, computedMessage);
 		}
-
+		this.emit('send', computedMessage);
 		this.emit('entry', data, level);
 	}
 
