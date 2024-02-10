@@ -38,6 +38,11 @@ export interface LoggerOptions {
 	 * @see FormatOptions
 	 */
 	formatOptions?: FormatOptions;
+
+	/**
+	 * The prefix to use (will not affect "passthrough" messages)
+	 */
+	prefix?: string;
 }
 
 export class Logger extends EventEmitter<{
@@ -52,7 +57,7 @@ export class Logger extends EventEmitter<{
 	protected _entries: string[] = [];
 	protected readonly io: Set<IO<SupportedInterface>> = new Set();
 	protected options: LoggerOptions;
-	constructor({ attachGlobalConsole = true, retainLogs = true, allowClearing = true, format, formatOptions }: Partial<LoggerOptions> = {}) {
+	constructor({ attachGlobalConsole = true, retainLogs = true, allowClearing = true, format, formatOptions, prefix }: Partial<LoggerOptions> = {}) {
 		super();
 
 		this.options = {
@@ -61,6 +66,7 @@ export class Logger extends EventEmitter<{
 			allowClearing,
 			format,
 			formatOptions,
+			prefix, 
 		};
 
 		if (this.options.attachGlobalConsole && 'console' in globalThis) {
@@ -193,6 +199,7 @@ export class Logger extends EventEmitter<{
 			message = {
 				contents: message,
 				level,
+				prefix: this.options.prefix
 			};
 		}
 		message.computed ||= formatMessage(message, this.options.format, this.options.formatOptions);
@@ -214,21 +221,6 @@ export class Logger extends EventEmitter<{
 		this.emit('send', message);
 		this.emit('entry', message.computed, level);
 	}
-
-	/**
-	 * Sends an I/O message
-	 * @param message the data from the input
-	 * @returns whether the message was sent
-	 * This is used to recieve data from inputs
-	 */
-	/*protected _send(message: IOMessage): boolean {
-		try {
-			this.send(message);
-			return true;
-		} catch (e) {
-			return false;
-		}
-	}*/
 
 	/**
 	 * Converts the log entries to a string.
