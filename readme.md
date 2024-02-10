@@ -42,7 +42,7 @@ import { Logger, LogLevel } from 'logzen';
 const logger = new Logger({ attachGlobalConsole: false });
 
 // Attach console with custom log levels
-logger.attachConsole(console, LogLevel.WARN, LogLevel.ERROR);
+logger.attach(console, LogLevel.WARN, LogLevel.ERROR);
 
 logger.error('This message will be sent to the console.');
 logger.log('This message will not be sent to the console!');
@@ -64,8 +64,8 @@ const errorFileStream = fs.createWriteStream('error.log', { flags: 'a' });
 const logger = new Logger({ attachGlobalConsole: false });
 
 // Attach the file stream with specific log levels
-logger.attachStream(logFileStream, LogLevel.LOG, LogLevel.INFO);
-logger.attachStream(errorFileStream, LogLevel.WARN, LogLevel.ERROR);
+logger.attach(logFileStream, LogLevel.LOG, LogLevel.INFO);
+logger.attach(errorFileStream, LogLevel.WARN, LogLevel.ERROR);
 
 logger.log('This log message will be written to the app.log file.');
 logger.error('This error message will also be written to the error.log file.');
@@ -79,8 +79,8 @@ You can detach streams and consoles from the `Logger` using the `detachStream` a
 const logger = new Logger();
 
 // Detach streams and Console objects
-logger.detachStream(stream, LogLevel.LOG, LogLevel.WARN);
-logger.detachConsole(console);
+logger.detach(stream, LogLevel.LOG, LogLevel.WARN);
+logger.detach(console);
 ```
 
 ### Attaching Consoles
@@ -90,7 +90,7 @@ You can also attach Console objects to the Logger instance to output logs to the
 ```javascript
 const logger = new Logger({ attachGlobalConsole: false });
 
-logger.attachConsole(console, LogLevel.WARN, LogLevel.ERROR);
+logger.attach(console, LogLevel.WARN, LogLevel.ERROR);
 
 logger.log('This log message will be not sent to the console.');
 logger.error('This error will be sent to the console!');
