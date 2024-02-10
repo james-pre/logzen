@@ -2,7 +2,7 @@ import EventEmitter from 'eventemitter3';
 import type { IO, IOMessage, SupportedInterface, SupportedInterfaceName } from './io';
 import { interfaces, isIO } from './io';
 import { LogLevel, allLogLevels } from './levels';
-import { computeLogMessage } from './utils';
+import { formatMessage, type FormatOptions } from './utils';
 
 /**
  * Options for configuring the Logger.
@@ -28,10 +28,16 @@ export interface LoggerOptions {
 
 	/**
 	 * The format to use for log messages
-	 * @see computeLogMessage
+	 * @see formatMessage
 	 * @default '($time) [$prefix$level] $message'
 	 */
-	logFormat: string;
+	format?: string;
+
+	/**
+	 * Options to use for formatting
+	 * @see FormatOptions
+	 */
+	formatOptions?: FormatOptions;
 }
 
 export class Logger extends EventEmitter<{
@@ -46,14 +52,15 @@ export class Logger extends EventEmitter<{
 	protected _entries: string[] = [];
 	protected readonly io: Set<IO<SupportedInterface>> = new Set();
 	protected options: LoggerOptions;
-	constructor({ attachGlobalConsole = true, retainLogs = true, allowClearing = true, logFormat = '($time) [$prefix$level] $message' }: Partial<LoggerOptions> = {}) {
+	constructor({ attachGlobalConsole = true, retainLogs = true, allowClearing = true, format, formatOptions }: Partial<LoggerOptions> = {}) {
 		super();
 
 		this.options = {
 			attachGlobalConsole,
 			retainLogs,
 			allowClearing,
-			logFormat,
+			format,
+			formatOptions,
 		};
 
 		if (this.options.attachGlobalConsole && 'console' in globalThis) {
@@ -188,7 +195,7 @@ export class Logger extends EventEmitter<{
 				level,
 			};
 		}
-		message.computed ||= computeLogMessage(message, this.options.logFormat);
+		message.computed ||= formatMessage(message, this.options.format, this.options.formatOptions);
 		if (this.options.retainLogs) {
 			this._entries.push(message.computed);
 		}

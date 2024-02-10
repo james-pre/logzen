@@ -15,7 +15,18 @@ export function getTimeString(time: number): string {
 }
 
 /**
- * Computes the log message with the timestamp and log level.
+ * Options when computing/formatting log messages
+ */
+export interface FormatOptions {
+	/**
+	 * The delimiter to place after the prefix
+	 * @default '/'
+	 */
+	prefixDelimiter: string;
+}
+
+/**
+ * Formats the log message
  * @param message The log message to be formatted/computed.
  * @param format The message format to use
  * @returns The formatted log message.
@@ -26,11 +37,11 @@ export function getTimeString(time: number): string {
  * - level: The log level as a string
  * - prefix: The prefix with a '/' appended if the prefix is truthy
  */
-export function computeLogMessage(message: IOMessage, format = '($time) [$prefix$level] $message'): string {
+export function formatMessage(message: IOMessage, format = '($time) [$prefix$level] $message', { prefixDelimiter = '/' }: Partial<FormatOptions> = {}): string {
 	const variables: Map<string, string> = new Map([
 		['time', getTimeString(performance.now())],
 		['level', LogLevel[message.level]],
-		['prefix', message.prefix ? message.prefix + '/' : ''],
+		['prefix', message.prefix ? message.prefix + prefixDelimiter : ''],
 		['message', message.contents],
 	]);
 	return format.replaceAll(/\$([\w_]+)/g, (text, key) => (variables.has(key) ? variables.get(key) : text));

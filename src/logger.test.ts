@@ -2,7 +2,7 @@ import { Writable } from 'stream';
 import { IO, SupportedInterface } from './io';
 import { LogLevel } from './levels';
 import { Logger } from './logger';
-import { computeLogMessage } from './utils';
+import { formatMessage } from './utils';
 
 describe('Logger', () => {
 	let logger: Logger;
@@ -47,7 +47,7 @@ describe('Logger', () => {
 		const contents = 'Test log message';
 		logger.send(contents, LogLevel.INFO);
 
-		const expected = computeLogMessage({ contents, level: LogLevel.INFO });
+		const expected = formatMessage({ contents, level: LogLevel.INFO });
 
 		expect(mockIO.io.write).toHaveBeenCalledWith(expected);
 		expect(logger.entries).toContain(expected);
@@ -71,7 +71,7 @@ describe('Logger', () => {
 		logger.send(message);
 
 		// Validate that the write method of the mock IO was called with the correct message including prefix
-		const expected = computeLogMessage(message);
+		const expected = formatMessage(message);
 		expect(mockIO.io.write).toHaveBeenCalledWith(expected);
 
 		// Validate that the log message with prefix was recorded in the logger's entries
@@ -90,7 +90,7 @@ describe('Logger', () => {
 		logger.send(contents, LogLevel.INFO);
 
 		// Validate that the log message was received by the receiver logger
-		const expected = computeLogMessage({ contents, level: LogLevel.INFO });
+		const expected = formatMessage({ contents, level: LogLevel.INFO });
 		expect(receiverLogger.entries).toContain(expected);
 	});
 
@@ -109,19 +109,19 @@ describe('Logger', () => {
 		const contents = 'Test log message';
 
 		logger.log(contents);
-		expect(logger.entries).toContain(computeLogMessage({ contents, level: LogLevel.LOG }));
+		expect(logger.entries).toContain(formatMessage({ contents, level: LogLevel.LOG }));
 
 		logger.info(contents);
-		expect(logger.entries).toContain(computeLogMessage({ contents, level: LogLevel.INFO }));
+		expect(logger.entries).toContain(formatMessage({ contents, level: LogLevel.INFO }));
 
 		const errorContents = new Error(contents);
 		logger.warn(errorContents);
-		expect(logger.entries).toContain(computeLogMessage({ contents: errorContents.toString(), level: LogLevel.WARN }));
+		expect(logger.entries).toContain(formatMessage({ contents: errorContents.toString(), level: LogLevel.WARN }));
 
 		logger.error(errorContents);
-		expect(logger.entries).toContain(computeLogMessage({ contents: errorContents.toString(), level: LogLevel.ERROR }));
+		expect(logger.entries).toContain(formatMessage({ contents: errorContents.toString(), level: LogLevel.ERROR }));
 
 		logger.debug(contents);
-		expect(logger.entries).toContain(computeLogMessage({ contents, level: LogLevel.DEBUG }));
+		expect(logger.entries).toContain(formatMessage({ contents, level: LogLevel.DEBUG }));
 	});
 });
