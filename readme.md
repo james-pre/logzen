@@ -1,12 +1,12 @@
 # LogZen
 
-LogZen is a simple and flexible logging library for Node.js that provides easy-to-use logging functionality with customizable log levels and the ability to output logs to different streams and consoles.
+Logzen is a simple and flexible logging library for Javascript that provides easy-to-use logging functionality with customizable log levels and the ability to output logs to different streams and consoles.
 
 [Documentation](https://dr-vortex.github.io/logzen)
 
 ## Installation
 
-You can install LogZen using npm:
+You can install Logzen using npm:
 
 ```bash
 npm install logzen
@@ -14,7 +14,7 @@ npm install logzen
 
 ## Usage
 
-To use LogZen in your project, you need to import the `Logger` class from the LogZen package:
+To use Logzen in your project, you need to import the `Logger` class from the Logzen package:
 
 ```javascript
 import { Logger } from 'logzen';
@@ -50,7 +50,7 @@ logger.log('This message will not be sent to the console!');
 
 ### Logging to Files
 
-LogZen supports logging to files by attaching file streams to the `Logger` instance. This allows you to send log entries with specific log levels to separate log files.
+Logzen supports logging to files by attaching file streams to the `Logger` instance. This allows you to send log entries with specific log levels to separate log files.
 
 ```javascript
 import { Logger, LogLevel } from 'logzen';
