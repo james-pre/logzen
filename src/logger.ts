@@ -267,20 +267,22 @@ export class Logger extends EventEmitter<{
 	 * Logs a warning message with the LogLevel.WARN level.
 	 * @param data - The error or log message.
 	 */
-	public warn(data: Error | string): void {
+	public warn(data: Error | string): Error {
 		const message = data.toString();
 		this.send(message, LogLevel.WARN);
 		this.emit('warn', message);
+		return data instanceof Error ? data : new Error(data);
 	}
 
 	/**
 	 * Logs an error message with the LogLevel.ERROR level.
 	 * @param data - The error or log message.
 	 */
-	public error(data: Error | string): void {
+	public error(data: Error | string): Error {
 		const message = data.toString();
 		this.send(message, LogLevel.ERROR);
 		this.emit('error', message);
+		return data instanceof Error ? data : new Error(data);
 	}
 
 	/**
