@@ -2,11 +2,9 @@
 	"compilerOptions": {
 		"lib": ["ESNext"],
 		"module": "ESNext",
-		"target": "ES2016",
+		"target": "ES2017",
 		"moduleResolution": "Bundler",
 		"outDir": "dist",
-		"typeRoots": ["node_modules/@types"],
-		"types": ["jest"],
 		"resolveJsonModule": true,
 		"esModuleInterop": true,
 		"noImplicitThis": true,
@@ -17,6 +15,6 @@
 		"entryPoints": ["src/index.ts"],
 		"out": "docs"
 	},
-	"include": ["./src/**/*"],
-	"exclude": ["node_modules"]
+	"include": ["./src/**/*.ts"],
+	"exclude": ["node_modules", "**/*.test.ts"]
 }
