@@ -3,8 +3,12 @@
 	"version": "0.3.4",
 	"description": "An easy to use utility for logging",
 	"main": "dist/logzen.min.js",
-	"types": "dist/index.d.ts",
+	"types": "dist",
 	"type": "module",
+	"exports": {
+		".": "./dist/index.js",
+		"./*": "./dist/*"
+	},
 	"scripts": {
 		"format:check": "prettier --check .",
 		"format": "prettier --write .",
