@@ -1,7 +1,7 @@
-import { LogLevel } from './levels';
+import { LogLevel } from './levels.js';
 import type { Readable, Writable } from 'stream';
 import type { ReadableStream, WritableStream } from 'stream/web';
-import { Logger } from './logger';
+import { Logger } from './logger.js';
 
 /**
  * For sending messages between interfaces and loggers

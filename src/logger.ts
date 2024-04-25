@@ -1,8 +1,8 @@
-import EventEmitter from 'eventemitter3';
-import type { IO, IOInterface, IOMessage, SupportedInterface, SupportedInterfaceName } from './io';
-import { interfaces, isIO } from './io';
-import { LogLevel, allLogLevels } from './levels';
-import { formatMessage, type FormatOptions } from './utils';
+import { EventEmitter } from 'eventemitter3';
+import type { IO, IOInterface, IOMessage, SupportedInterface, SupportedInterfaceName } from './io.js';
+import { interfaces, isIO } from './io.js';
+import { LogLevel, allLogLevels } from './levels.js';
+import { formatMessage, type FormatOptions } from './utils.js';
 
 /**
  * Options for configuring the Logger.
