@@ -8,7 +8,7 @@ describe('Logger', () => {
 	let logger: Logger;
 
 	beforeEach(() => {
-		logger = new Logger({ noGlobalConsole: true, retainLogs: true });
+		logger = new Logger({ noGlobalConsole: true, retainLogs: true, hideStack: true });
 	});
 
 	test('Logger initialization', () => {
