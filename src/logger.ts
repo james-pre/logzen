@@ -9,45 +9,46 @@ import { formatMessage, type FormatOptions } from './utils';
  */
 export interface LoggerOptions {
 	/**
-	 * Flag to attach the global console to the Logger during initialization.
-	 * @default true
+	 * Whether to attach the global console to the Logger during initialization.
+	 * @default false
 	 */
-	attachGlobalConsole: boolean;
+	noGlobalConsole: boolean;
 
 	/**
 	 * Whether to retain logs in memory.
-	 * @default true
+	 * @default false
 	 */
 	retainLogs: boolean;
 
 	/**
-	 * Whether to allow clearing log entries
-	 * @default true
+	 * Whether to disable clearing log entries
+	 * @default false
 	 */
-	allowClearing: boolean;
+	disableClearing: boolean;
 
 	/**
 	 * The format to use for log messages
 	 * @see formatMessage
 	 * @default '($time) [$prefix$level] $message'
 	 */
-	format?: string;
+	format: string;
 
 	/**
 	 * Options to use for formatting
 	 * @see FormatOptions
 	 */
-	formatOptions?: FormatOptions;
+	formatOptions: FormatOptions;
 
 	/**
 	 * The prefix to use (will not affect "passthrough" messages)
 	 */
-	prefix?: string;
+	prefix: string;
 
 	/**
 	 * Whether logged errors will include a stack
+	 * @default false
 	 */
-	includeStack: boolean;
+	hideStack: boolean;
 }
 
 export class Logger extends EventEmitter<{
@@ -62,16 +63,11 @@ export class Logger extends EventEmitter<{
 	protected _entries: string[] = [];
 	protected readonly io: Set<IO<SupportedInterface>> = new Set();
 	constructor(
-		protected options: Partial<LoggerOptions> = {
-			attachGlobalConsole: true,
-			retainLogs: true,
-			allowClearing: true,
-			includeStack: true,
-		}
+		protected options: Partial<LoggerOptions> = {}
 	) {
 		super();
 
-		if (options.attachGlobalConsole && 'console' in globalThis) {
+		if (!options.noGlobalConsole && 'console' in globalThis) {
 			this.attach(globalThis.console);
 		}
 	}
@@ -238,7 +234,7 @@ export class Logger extends EventEmitter<{
 	 * @returns whether the entries where cleared or not
 	 */
 	public clear(): boolean {
-		if (!this.options.retainLogs || !this.options.allowClearing) {
+		if (!this.options.retainLogs || this.options.disableClearing) {
 			return false;
 		}
 
@@ -271,7 +267,7 @@ export class Logger extends EventEmitter<{
 	 * @param data - The error or log message.
 	 */
 	public warn(data: Error | string): Error {
-		const message = typeof data == 'string' ? data : this.options.includeStack ? data.stack : data.toString();
+		const message = typeof data == 'string' ? data : this.options.hideStack ? data.stack : data.toString();
 		this.send(message, LogLevel.WARN);
 		this.emit('warn', message);
 		return data instanceof Error ? data : new Error(data);
@@ -282,7 +278,7 @@ export class Logger extends EventEmitter<{
 	 * @param data - The error or log message.
 	 */
 	public error(data: Error | string): Error {
-		const message = typeof data == 'string' ? data : this.options.includeStack ? data.stack : data.toString();
+		const message = typeof data == 'string' ? data : this.options.hideStack ? data.stack : data.toString();
 		this.send(message, LogLevel.ERROR);
 		this.emit('error', message);
 		return data instanceof Error ? data : new Error(data);

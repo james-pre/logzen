@@ -8,7 +8,7 @@ describe('Logger', () => {
 	let logger: Logger;
 
 	beforeEach(() => {
-		logger = new Logger({ attachGlobalConsole: false });
+		logger = new Logger({ noGlobalConsole: true, retainLogs: true });
 	});
 
 	test('Logger initialization', () => {
@@ -79,7 +79,7 @@ describe('Logger', () => {
 	});
 
 	test('Logger to Logger testing', () => {
-		const receiverLogger = new Logger({ attachGlobalConsole: false });
+		const receiverLogger = new Logger({ noGlobalConsole: false });
 
 		// Attach the receiver logger as an output to the sender logger
 		logger.attach(receiverLogger);
