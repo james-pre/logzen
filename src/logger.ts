@@ -62,9 +62,7 @@ export class Logger extends EventEmitter<{
 }> {
 	protected _entries: string[] = [];
 	protected readonly io: Set<IO<SupportedInterface>> = new Set();
-	constructor(
-		protected options: Partial<LoggerOptions> = {}
-	) {
+	constructor(protected options: Partial<LoggerOptions> = {}) {
 		super();
 
 		if (!options.noGlobalConsole && 'console' in globalThis) {
