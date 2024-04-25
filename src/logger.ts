@@ -3,7 +3,6 @@ import type { IO, IOInterface, IOMessage, SupportedInterface, SupportedInterface
 import { interfaces, isIO } from './io';
 import { LogLevel, allLogLevels } from './levels';
 import { formatMessage, type FormatOptions } from './utils';
-import { assignWithDefaults } from 'utilium';
 
 /**
  * Options for configuring the Logger.
@@ -62,16 +61,15 @@ export class Logger extends EventEmitter<{
 }> {
 	protected _entries: string[] = [];
 	protected readonly io: Set<IO<SupportedInterface>> = new Set();
-	protected options: LoggerOptions = {
+	constructor(protected options: Partial<LoggerOptions> = {
 		attachGlobalConsole: true,
 		retainLogs: true,
 		allowClearing: true,
 		includeStack: true,
-	};
-	constructor(options: Partial<LoggerOptions> = {}) {
+	}) {
 		super();
 
-		assignWithDefaults(this.options, options);
+		
 
 		if (options.attachGlobalConsole && 'console' in globalThis) {
 			this.attach(globalThis.console);
