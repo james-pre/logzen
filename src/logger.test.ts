@@ -79,7 +79,7 @@ describe('Logger', () => {
 	});
 
 	test('Logger to Logger testing', () => {
-		const receiverLogger = new Logger({ noGlobalConsole: false });
+		const receiverLogger = new Logger({ noGlobalConsole: true, retainLogs: true });
 
 		// Attach the receiver logger as an output to the sender logger
 		logger.attach(receiverLogger);
