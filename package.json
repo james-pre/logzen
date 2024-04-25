@@ -9,6 +9,13 @@
 		".": "./dist/index.js",
 		"./*": "./dist/*"
 	},
+	"typesVersions": {
+		"*": {
+			"*": [
+				"./dist/*"
+			]
+		}
+	},
 	"scripts": {
 		"format:check": "prettier --check .",
 		"format": "prettier --write .",
