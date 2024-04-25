@@ -1,8 +1,19 @@
 {
-	"preset": "ts-jest",
+	"preset": "ts-jest/presets/default-esm",
 	"testEnvironment": "node",
-	"transform": {
-		"^.+\\.tsx?$": "ts-jest"
+	"extensionsToTreatAsEsm": [".ts"],
+	"testMatch": ["./**/*.test.ts"],
+	"moduleNameMapper": {
+		"^(\\.{1,2}/.*)\\.js$": "$1"
 	},
-	"moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+	"transform": {
+		"^.+\\.ts$": [
+			"ts-jest",
+			{
+				"tsconfig": "tests/tsconfig.json",
+				"useESM": true
+			}
+		]
+	},
+	"verbose": true
 }

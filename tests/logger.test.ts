@@ -1,8 +1,8 @@
 import { Writable } from 'stream';
-import { IO, SupportedInterface } from './io';
-import { LogLevel } from './levels';
-import { Logger } from './logger';
-import { formatMessage } from './utils';
+import { IO, SupportedInterface } from '../src/io.js';
+import { LogLevel } from '../src/levels.js';
+import { Logger } from '../src/logger.js';
+import { formatMessage } from '../src/utils.js';
 
 describe('Logger', () => {
 	let logger: Logger;
