@@ -1,8 +1,9 @@
 import EventEmitter from 'eventemitter3';
-import type { IO, IOMessage, SupportedInterface, SupportedInterfaceName } from './io';
+import type { IO, IOInterface, IOMessage, SupportedInterface, SupportedInterfaceName } from './io';
 import { interfaces, isIO } from './io';
 import { LogLevel, allLogLevels } from './levels';
 import { formatMessage, type FormatOptions } from './utils';
+import { assignWithDefaults } from 'utilium';
 
 /**
  * Options for configuring the Logger.
@@ -43,33 +44,36 @@ export interface LoggerOptions {
 	 * The prefix to use (will not affect "passthrough" messages)
 	 */
 	prefix?: string;
+
+	/**
+	 * Whether logged errors will include a stack
+	 */
+	includeStack: boolean;
 }
 
 export class Logger extends EventEmitter<{
-	entry: (data: string, level: LogLevel) => void;
-	log: (data: string) => void;
-	info: (data: string) => void;
-	warn: (data: string | Error) => void;
-	error: (data: string | Error) => void;
-	debug: (data: string) => void;
-	send: (data: IOMessage) => void;
+	entry: [data: string, level: LogLevel];
+	log: [data: string];
+	info: [data: string];
+	warn: [data: string | Error];
+	error: [data: string | Error];
+	debug: [data: string];
+	send: [data: IOMessage];
 }> {
 	protected _entries: string[] = [];
 	protected readonly io: Set<IO<SupportedInterface>> = new Set();
-	protected options: LoggerOptions;
-	constructor({ attachGlobalConsole = true, retainLogs = true, allowClearing = true, format, formatOptions, prefix }: Partial<LoggerOptions> = {}) {
+	protected options: LoggerOptions = {
+		attachGlobalConsole: true,
+		retainLogs: true,
+		allowClearing: true,
+		includeStack: true,
+	};
+	constructor(options: Partial<LoggerOptions> = {}) {
 		super();
 
-		this.options = {
-			attachGlobalConsole,
-			retainLogs,
-			allowClearing,
-			format,
-			formatOptions,
-			prefix,
-		};
+		assignWithDefaults(this.options, options);
 
-		if (this.options.attachGlobalConsole && 'console' in globalThis) {
+		if (options.attachGlobalConsole && 'console' in globalThis) {
 			this.attach(globalThis.console);
 		}
 	}
@@ -215,8 +219,9 @@ export class Logger extends EventEmitter<{
 			if (!(type in interfaces)) {
 				throw new TypeError('Invalid I/O type: ' + type);
 			}
-			// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-			interfaces[type].send(io as any, { ...message, prefix });
+
+			const int: IOInterface<SupportedInterface> = interfaces[type];
+			int.send(io, { ...message, prefix });
 		}
 		this.emit('send', message);
 		this.emit('entry', message.computed, level);
@@ -268,7 +273,7 @@ export class Logger extends EventEmitter<{
 	 * @param data - The error or log message.
 	 */
 	public warn(data: Error | string): Error {
-		const message = data.toString();
+		const message = typeof data == 'string' ? data : this.options.includeStack ? data.stack : data.toString();
 		this.send(message, LogLevel.WARN);
 		this.emit('warn', message);
 		return data instanceof Error ? data : new Error(data);
@@ -279,7 +284,7 @@ export class Logger extends EventEmitter<{
 	 * @param data - The error or log message.
 	 */
 	public error(data: Error | string): Error {
-		const message = data.toString();
+		const message = typeof data == 'string' ? data : this.options.includeStack ? data.stack : data.toString();
 		this.send(message, LogLevel.ERROR);
 		this.emit('error', message);
 		return data instanceof Error ? data : new Error(data);

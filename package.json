@@ -43,6 +43,7 @@
 		"typescript": "^5.1.6"
 	},
 	"dependencies": {
-		"eventemitter3": "^5.0.1"
+		"eventemitter3": "^5.0.1",
+		"utilium": "^0.2.1"
 	}
 }
