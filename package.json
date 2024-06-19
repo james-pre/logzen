@@ -27,7 +27,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/dr-vortex/logzen.git"
+		"url": "git+https://github.com/james-pre/logzen.git"
 	},
 	"keywords": [
 		"log",
@@ -36,9 +36,9 @@
 	"author": "Dr. Vortex",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/dr-vortex/logzen/issues"
+		"url": "https://github.com/james-pre/logzen/issues"
 	},
-	"homepage": "https://github.com/dr-vortex/logzen#readme",
+	"homepage": "https://github.com/james-pre/logzen#readme",
 	"devDependencies": {
 		"@types/jest": "^29.5.3",
 		"@types/node": "^20.12.7",

@@ -2,7 +2,7 @@
 
 Logzen is a simple and flexible logging library for Javascript that provides easy-to-use logging functionality with customizable log levels and the ability to output logs to different streams and consoles.
 
-[Documentation](https://dr-vortex.github.io/logzen)
+[Documentation](https://james-pre.github.io/logzen)
 
 ## Installation
 
