@@ -45,10 +45,16 @@ export interface LoggerOptions {
 	prefix: string;
 
 	/**
+	 * Whether logged warnings will include a stack
+	 * @default false
+	 */
+	hideWarningStack: boolean;
+
+	/**
 	 * Whether logged errors will include a stack
 	 * @default false
 	 */
-	hideStack: boolean;
+	hideErrorStack: boolean;
 }
 
 export class Logger extends EventEmitter<{
@@ -266,7 +272,7 @@ export class Logger extends EventEmitter<{
 	 */
 	public warn(data: Error | string): Error {
 		const error = data instanceof Error ? data : new Error(data);
-		const message = this.options.hideStack ? error.toString() : error.stack;
+		const message = this.options.hideWarningStack ? error.toString() : error.stack;
 		this.send(message, LogLevel.WARN);
 		this.emit('warn', message);
 		return error;
@@ -278,7 +284,7 @@ export class Logger extends EventEmitter<{
 	 */
 	public error(data: Error | string): Error {
 		const error = data instanceof Error ? data : new Error(data);
-		const message = this.options.hideStack ? error.toString() : error.stack;
+		const message = this.options.hideErrorStack ? error.toString() : error.stack;
 		this.send(message, LogLevel.ERROR);
 		this.emit('error', message);
 		return error;
