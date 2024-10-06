@@ -265,10 +265,11 @@ export class Logger extends EventEmitter<{
 	 * @param data - The error or log message.
 	 */
 	public warn(data: Error | string): Error {
-		const message = typeof data == 'string' ? data : this.options.hideStack ? data.toString() : data.stack;
+		const error = data instanceof Error ? data : new Error(data);
+		const message = this.options.hideStack ? error.toString() : error.stack;
 		this.send(message, LogLevel.WARN);
 		this.emit('warn', message);
-		return data instanceof Error ? data : new Error(data);
+		return error;
 	}
 
 	/**
@@ -276,10 +277,11 @@ export class Logger extends EventEmitter<{
 	 * @param data - The error or log message.
 	 */
 	public error(data: Error | string): Error {
-		const message = typeof data == 'string' ? data : this.options.hideStack ? data.toString() : data.stack;
+		const error = data instanceof Error ? data : new Error(data);
+		const message = this.options.hideStack ? error.toString() : error.stack;
 		this.send(message, LogLevel.ERROR);
 		this.emit('error', message);
-		return data instanceof Error ? data : new Error(data);
+		return error;
 	}
 
 	/**
