@@ -246,18 +246,18 @@ export class Logger extends EventEmitter<{
 	 * Logs a message with the LogLevel.LOG level.
 	 * @param data - The log message.
 	 */
-	public log(data: string): void {
-		this.send(data, LogLevel.LOG);
-		this.emit('log', data);
+	public log(...data: string[]): void {
+		this.send(data.join(' '), LogLevel.LOG);
+		this.emit('log', data.join(' '));
 	}
 
 	/**
 	 * Logs a info message with the LogLevel.INFO level.
 	 * @param data - The log message.
 	 */
-	public info(data: string): void {
-		this.send(data, LogLevel.INFO);
-		this.emit('info', data);
+	public info(...data: string[]): void {
+		this.send(data.join(' '), LogLevel.INFO);
+		this.emit('info', data.join(' '));
 	}
 
 	/**
@@ -288,8 +288,8 @@ export class Logger extends EventEmitter<{
 	 * Logs a debug message with the LogLevel.DEBUG level.
 	 * @param data - The log message.
 	 */
-	public debug(data: string): void {
-		this.send(data, LogLevel.DEBUG);
-		this.emit('debug', data);
+	public debug(...data: string[]): void {
+		this.send(data.join(' '), LogLevel.DEBUG);
+		this.emit('debug', data.join(' '));
 	}
 }
