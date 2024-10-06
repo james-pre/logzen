@@ -3,6 +3,8 @@ import { ReadableStream, WritableStream } from 'stream/web';
 import { IO, IOInterface, SupportedInterface, SupportedInterfaces, interfaces, isIO } from '../src/io.js';
 import { LogLevel } from '../src/levels.js';
 import { Logger } from '../src/logger.js';
+import { test, suite, mock } from 'node:test';
+import assert from 'node:assert';
 
 const _interfaces: SupportedInterfaces = {
 	Readable: new Readable({
@@ -21,7 +23,7 @@ const _interfaces: SupportedInterfaces = {
 	Logger: new Logger(),
 };
 
-describe('IO', () => {
+suite('IO', () => {
 	test('isIO()', () => {
 		const readable: IO<Readable> = {
 			io: new Readable(),
@@ -37,10 +39,10 @@ describe('IO', () => {
 			type: 'Writable',
 		};
 
-		expect(isIO(readable)).toBe(true);
-		expect(isIO(writable)).toBe(true);
-		expect(isIO(null)).toBe(false);
-		expect(isIO({})).toBe(false);
+		assert(isIO(readable));
+		assert(isIO(writable));
+		assert(!isIO(null));
+		assert(!isIO({}));
 	});
 
 	for (const [interfaceName, ioInstance] of Object.entries(_interfaces)) {
@@ -49,13 +51,13 @@ describe('IO', () => {
 		if (typeof ioInterface.send == 'function') {
 			test(`${interfaceName}.send()`, () => {
 				const result = ioInterface.send(ioInstance, { contents: 'test', level: LogLevel.LOG, computed: 'test' });
-				expect(result).toBe(true);
+				assert(result);
 			});
 		}
 
 		if (typeof ioInterface.receive == 'function') {
 			test(`${interfaceName}.receive`, () => {
-				const handler = jest.fn();
+				const handler = mock.fn();
 				ioInterface.receive(ioInstance, handler);
 			});
 		}

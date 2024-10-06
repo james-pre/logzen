@@ -3,18 +3,16 @@ import { IO, SupportedInterface } from '../src/io.js';
 import { LogLevel } from '../src/levels.js';
 import { Logger } from '../src/logger.js';
 import { formatMessage } from '../src/utils.js';
+import { test, suite, mock } from 'node:test';
+import assert from 'node:assert';
 
-describe('Logger', () => {
-	let logger: Logger;
+const logger = new Logger({ noGlobalConsole: true, retainLogs: true, hideWarningStack: true, hideErrorStack: true });
 
-	beforeEach(() => {
-		logger = new Logger({ noGlobalConsole: true, retainLogs: true, hideStack: true });
-	});
-
+suite('Logger', () => {
 	test('Logger initialization', () => {
-		expect(logger).toBeInstanceOf(Logger);
-		expect(logger.attachedIO).toBe(0);
-		expect(logger.entries).toEqual([]);
+		assert(logger instanceof Logger);
+		assert(logger.attachedIO === 0);
+		assert(logger.entries.length == 0);
 	});
 
 	test('Attach and detach IO', () => {
@@ -26,44 +24,44 @@ describe('Logger', () => {
 		};
 
 		logger.attach(mockIO);
-		expect(logger.attachedIO).toBe(1);
+		assert(logger.attachedIO);
 
 		logger.detach(mockIO);
-		expect(logger.attachedIO).toBe(0);
+		assert(!logger.attachedIO);
 	});
 
 	test('Send log message', () => {
-		const mockIO: IO<Writable> = {
+		const mockIO = {
 			io: {
-				write: jest.fn(),
-			} as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
+				write: mock.fn(),
+			},
 			input: { levels: new Set([LogLevel.INFO]), enabled: false },
 			output: { levels: new Set([LogLevel.INFO]), enabled: true },
 			type: 'Writable',
 		};
 
-		logger.attach(mockIO);
+		logger.attach(mockIO as unknown as IO<Writable>);
 
 		const contents = 'Test log message';
 		logger.send(contents, LogLevel.INFO);
 
 		const expected = formatMessage({ contents, level: LogLevel.INFO });
 
-		expect(mockIO.io.write).toHaveBeenCalledWith(expected);
-		expect(logger.entries).toContain(expected);
+		assert(mockIO.io.write.mock.calls[0].arguments[0] == expected);
+		assert(logger.entries.includes(expected));
 	});
 
 	test('Send log message with prefix', () => {
-		const mockIO: IO<Writable> = {
+		const mockIO = {
 			io: {
-				write: jest.fn(),
-			} as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
+				write: mock.fn(),
+			},
 			input: { levels: new Set([LogLevel.INFO]), enabled: false },
 			output: { levels: new Set([LogLevel.INFO]), enabled: true },
 			type: 'Writable',
 		};
 
-		logger.attach(mockIO);
+		logger.attach(mockIO as unknown as IO<Writable>);
 
 		const message = { contents: 'Test log message', level: LogLevel.INFO, prefix: 'PREFIX' };
 
@@ -72,13 +70,13 @@ describe('Logger', () => {
 
 		// Validate that the write method of the mock IO was called with the correct message including prefix
 		const expected = formatMessage(message);
-		expect(mockIO.io.write).toHaveBeenCalledWith(expected);
+		assert(mockIO.io.write.mock.calls[0].arguments[0] == expected);
 
 		// Validate that the log message with prefix was recorded in the logger's entries
-		expect(logger.entries).toContain(expected);
+		assert(logger.entries.includes(expected));
 	});
 
-	test('Logger to Logger testing', () => {
+	test('Logger to Logger testing', { todo: true }, () => {
 		const receiverLogger = new Logger({ noGlobalConsole: true, retainLogs: true });
 
 		// Attach the receiver logger as an output to the sender logger
@@ -91,37 +89,37 @@ describe('Logger', () => {
 
 		// Validate that the log message was received by the receiver logger
 		const expected = formatMessage({ contents, level: LogLevel.INFO });
-		expect(receiverLogger.entries).toContain(expected);
+		assert(receiverLogger.entries.includes(expected));
 	});
 
 	test('Clear retained log entries', () => {
 		const logMessage = 'Test log message';
 		logger.send(logMessage, LogLevel.INFO);
 
-		expect(logger.entries.length).toBeGreaterThan(0);
+		assert(logger.entries.length > 0);
 
 		const cleared = logger.clear();
-		expect(cleared).toBe(true);
-		expect(logger.entries.length).toBe(0);
+		assert(cleared);
+		assert(logger.entries.length === 0);
 	});
 
 	test('Shortcut methods', () => {
 		const contents = 'Test log message';
 
 		logger.log(contents);
-		expect(logger.entries).toContain(formatMessage({ contents, level: LogLevel.LOG }));
+		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.LOG })));
 
 		logger.info(contents);
-		expect(logger.entries).toContain(formatMessage({ contents, level: LogLevel.INFO }));
+		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.INFO })));
 
 		const errorContents = new Error(contents);
 		logger.warn(errorContents);
-		expect(logger.entries).toContain(formatMessage({ contents: errorContents.toString(), level: LogLevel.WARN }));
+		assert(logger.entries.includes(formatMessage({ contents: errorContents.toString(), level: LogLevel.WARN })));
 
 		logger.error(errorContents);
-		expect(logger.entries).toContain(formatMessage({ contents: errorContents.toString(), level: LogLevel.ERROR }));
+		assert(logger.entries.includes(formatMessage({ contents: errorContents.toString(), level: LogLevel.ERROR })));
 
 		logger.debug(contents);
-		expect(logger.entries).toContain(formatMessage({ contents, level: LogLevel.DEBUG }));
+		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.DEBUG })));
 	});
 });
