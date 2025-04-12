@@ -1,5 +1,5 @@
 import type { IOMessage } from './io.js';
-import { LogLevel } from './levels.js';
+import { levelText, LogLevel } from './levels.js';
 
 /**
  * Helper function to get a formatted time string from a timestamp.
@@ -40,7 +40,7 @@ export interface FormatOptions {
 export function formatMessage(message: IOMessage, format = '($time) [$prefix$level] $message', { prefixDelimiter = '/' }: Partial<FormatOptions> = {}): string {
 	const variables: Map<string, string> = new Map([
 		['time', getTimeString(performance.now())],
-		['level', LogLevel[message.level]],
+		['level', levelText[message.level]],
 		['prefix', message.prefix ? message.prefix + prefixDelimiter : ''],
 		['message', message.contents],
 	]);

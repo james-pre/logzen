@@ -1,4 +1,4 @@
-import { LogLevel } from './levels.js';
+import { levelText, LogLevel } from './levels.js';
 import type { Readable, Writable } from 'stream';
 import type { ReadableStream, WritableStream } from 'stream/web';
 import { Logger } from './logger.js';
@@ -158,7 +158,7 @@ export const interfaces: { [N in SupportedInterfaceName]: IOInterface<SupportedI
 	Console: {
 		send(io, { computed, level }) {
 			try {
-				const method = LogLevel[level].toLowerCase();
+				const method = levelText[level];
 				if (typeof io[method] == 'function') {
 					io[method](computed);
 				}
