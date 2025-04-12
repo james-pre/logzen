@@ -2,28 +2,13 @@
 	"name": "logzen",
 	"version": "0.3.10",
 	"description": "An easy to use utility for logging",
-	"main": "dist/logzen.min.js",
-	"types": "dist",
+	"author": "James Prevett <jp@jamespre.dev>",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"type": "module",
 	"exports": {
 		".": "./dist/index.js",
 		"./*": "./dist/*"
-	},
-	"typesVersions": {
-		"*": {
-			"*": [
-				"./dist/*"
-			]
-		}
-	},
-	"scripts": {
-		"format:check": "prettier --check .",
-		"format": "prettier --write .",
-		"lint": "eslint src && tsc --noEmit",
-		"build": "tsx scripts/build.ts",
-		"build:docs": "typedoc src/index.ts --out docs",
-		"test": "tsx --test",
-		"prepublishOnly": "npm run format && npm run lint && npm run build"
 	},
 	"repository": {
 		"type": "git",
@@ -33,12 +18,20 @@
 		"log",
 		"logger"
 	],
-	"author": "Dr. Vortex",
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/james-pre/logzen/issues"
 	},
 	"homepage": "https://github.com/james-pre/logzen#readme",
+	"scripts": {
+		"format:check": "prettier --check .",
+		"format": "prettier --write .",
+		"lint": "eslint src && tsc --noEmit",
+		"build": "tsc",
+		"build:docs": "typedoc src/index.ts --out docs",
+		"test": "tsx --test",
+		"prepublishOnly": "npm run format && npm run lint && npm run build"
+	},
 	"devDependencies": {
 		"@types/node": "^22.7.4",
 		"@typescript-eslint/eslint-plugin": "^7.7.1",

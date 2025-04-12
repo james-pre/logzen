@@ -2,10 +2,10 @@
  * Enumeration of log levels.
  */
 export enum LogLevel {
-	LOG = 0,
-	INFO = 1,
-	WARN = 2,
-	ERROR = 3,
+	ERROR = 0,
+	WARN = 1,
+	NOTICE = 2,
+	INFO = 3,
 	DEBUG = 4,
 }
 

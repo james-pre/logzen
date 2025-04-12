@@ -59,12 +59,12 @@ export interface LoggerOptions {
 
 export class Logger extends EventEmitter<{
 	entry: [data: string, level: LogLevel];
-	log: [data: string];
-	info: [data: string];
-	warn: [data: string | Error];
-	error: [data: string | Error];
-	debug: [data: string];
 	send: [data: IOMessage];
+	error: [data: string | Error];
+	warn: [data: string | Error];
+	notice: [data: string];
+	info: [data: string];
+	debug: [data: string];
 }> {
 	protected _entries: string[] = [];
 	protected readonly io: Set<IO<SupportedInterface>> = new Set();
@@ -194,9 +194,9 @@ export class Logger extends EventEmitter<{
 	/**
 	 * Outputs a log message to attached outputs.
 	 * @param message The log message to be sent. Can be an object with the message details or string with the message contents.
-	 * @param level The log level for the message. Defaults to LogLevel.LOG.
+	 * @param level The log level for the message. Defaults to LogLevel.INFO.
 	 */
-	public send(message: string | IOMessage, level: LogLevel = LogLevel.LOG): void {
+	public send(message: string | IOMessage, level: LogLevel = LogLevel.INFO): void {
 		if (typeof message == 'string') {
 			message = {
 				contents: message,
@@ -249,21 +249,21 @@ export class Logger extends EventEmitter<{
 	// easy to use shortcut methods
 
 	/**
-	 * Logs a message with the LogLevel.LOG level.
-	 * @param data - The log message.
-	 */
-	public log(...data: string[]): void {
-		this.send(data.join(' '), LogLevel.LOG);
-		this.emit('log', data.join(' '));
-	}
-
-	/**
-	 * Logs a info message with the LogLevel.INFO level.
+	 * Logs a message with the LogLevel.INFO level.
 	 * @param data - The log message.
 	 */
 	public info(...data: string[]): void {
 		this.send(data.join(' '), LogLevel.INFO);
 		this.emit('info', data.join(' '));
+	}
+
+	/**
+	 * Logs a info message with the LogLevel.NOTICE level.
+	 * @param data - The log message.
+	 */
+	public notice(...data: string[]): void {
+		this.send(data.join(' '), LogLevel.INFO);
+		this.emit('notice', data.join(' '));
 	}
 
 	/**
