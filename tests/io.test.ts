@@ -50,7 +50,7 @@ suite('IO', () => {
 
 		if (typeof ioInterface.send == 'function') {
 			test(`${interfaceName}.send()`, () => {
-				const result = ioInterface.send(ioInstance, { contents: 'test', level: LogLevel.LOG, computed: 'test' });
+				const result = ioInterface.send(ioInstance, { contents: 'test', level: LogLevel.INFO, computed: 'test' });
 				assert(result);
 			});
 		}

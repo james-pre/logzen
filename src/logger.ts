@@ -104,8 +104,8 @@ export class Logger extends EventEmitter<{
 	public attach<I extends SupportedInterface>(io: I, levels?: LogLevel[], prefix?: string): void;
 	public attach<I extends SupportedInterface>(io: IO<I>): void;
 	public attach<I extends SupportedInterface>(_io: IO<I> | I, inputLevels: LogLevel[] = allLogLevels, outputLevels?: LogLevel[] | string, prefix?: string): void {
-		inputLevels = inputLevels instanceof Array ? inputLevels : allLogLevels;
-		outputLevels = outputLevels instanceof Array ? outputLevels : inputLevels;
+		inputLevels = Array.isArray(inputLevels) ? inputLevels : allLogLevels;
+		outputLevels = Array.isArray(outputLevels) ? outputLevels : inputLevels;
 		prefix = typeof outputLevels == 'string' ? outputLevels : prefix;
 		const io = isIO(_io) ? _io.io : _io;
 		const type = ('io' in _io && 'type' in _io ? _io.type : _io instanceof globalThis.console.constructor ? 'Console' : _io.constructor.name) as SupportedInterfaceName;
@@ -152,8 +152,8 @@ export class Logger extends EventEmitter<{
 	public detach<I extends SupportedInterface>(io: I, levels?: LogLevel[]): void;
 	public detach<I extends SupportedInterface>(io: IO<I>): void;
 	public detach<I extends SupportedInterface>(_io: IO<I> | I, inputLevels: LogLevel[] = allLogLevels, outputLevels?: LogLevel[]): void {
-		inputLevels = inputLevels instanceof Array ? inputLevels : allLogLevels;
-		outputLevels = outputLevels instanceof Array ? outputLevels : inputLevels;
+		inputLevels = Array.isArray(inputLevels) ? inputLevels : allLogLevels;
+		outputLevels = Array.isArray(outputLevels) ? outputLevels : inputLevels;
 		const io = [...this.io.values()].find(({ io: existing }) => existing == (isIO(_io) ? _io.io : _io)) as IO<I>;
 		if (!io) {
 			throw new ReferenceError('I/O not attached to Logger');
@@ -269,6 +269,7 @@ export class Logger extends EventEmitter<{
 	/**
 	 * Logs a warning message with the LogLevel.WARN level.
 	 * @param data - The error or log message.
+	 * @todo Replace with `Error.isError` once it is widely available
 	 */
 	public warn(data: Error | string): Error {
 		const error = data instanceof Error ? data : new Error(data);
@@ -281,6 +282,7 @@ export class Logger extends EventEmitter<{
 	/**
 	 * Logs an error message with the LogLevel.ERROR level.
 	 * @param data - The error or log message.
+	 * @todo Replace with `Error.isError` once it is widely available
 	 */
 	public error(data: Error | string): Error {
 		const error = data instanceof Error ? data : new Error(data);

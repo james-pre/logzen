@@ -11,8 +11,8 @@ const logger = new Logger({ noGlobalConsole: true, retainLogs: true, hideWarning
 suite('Logger', () => {
 	test('Logger initialization', () => {
 		assert(logger instanceof Logger);
-		assert(logger.attachedIO === 0);
-		assert(logger.entries.length == 0);
+		assert.equal(logger.attachedIO, 0);
+		assert.equal(logger.entries.length, 0);
 	});
 
 	test('Attach and detach IO', () => {
@@ -47,7 +47,7 @@ suite('Logger', () => {
 
 		const expected = formatMessage({ contents, level: LogLevel.INFO });
 
-		assert(mockIO.io.write.mock.calls[0].arguments[0] == expected);
+		assert.equal(mockIO.io.write.mock.calls[0].arguments[0], expected);
 		assert(logger.entries.includes(expected));
 	});
 
@@ -70,7 +70,7 @@ suite('Logger', () => {
 
 		// Validate that the write method of the mock IO was called with the correct message including prefix
 		const expected = formatMessage(message);
-		assert(mockIO.io.write.mock.calls[0].arguments[0] == expected);
+		assert.equal(mockIO.io.write.mock.calls[0].arguments[0], expected);
 
 		// Validate that the log message with prefix was recorded in the logger's entries
 		assert(logger.entries.includes(expected));
@@ -100,17 +100,17 @@ suite('Logger', () => {
 
 		const cleared = logger.clear();
 		assert(cleared);
-		assert(logger.entries.length === 0);
+		assert.equal(logger.entries.length, 0);
 	});
 
 	test('Shortcut methods', () => {
 		const contents = 'Test log message';
 
-		logger.log(contents);
-		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.LOG })));
-
 		logger.info(contents);
 		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.INFO })));
+
+		logger.notice(contents);
+		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.NOTICE })));
 
 		const errorContents = new Error(contents);
 		logger.warn(errorContents);
