@@ -1,6 +1,6 @@
 import type { Readable, Writable } from 'stream';
 import type { ReadableStream, WritableStream } from 'stream/web';
-import { levelText, LogLevel } from './levels.js';
+import { LogLevel } from './levels.js';
 import { Logger } from './logger.js';
 
 /**
