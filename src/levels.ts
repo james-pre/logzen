@@ -11,7 +11,9 @@ export enum LogLevel {
 
 export const levelText = ['error', 'warn', 'notice', 'info', 'debug'] as const satisfies { [K in LogLevel]: string };
 
-export function parseLevel(text: LogLevel | (typeof levelText)[LogLevel]): LogLevel {
+export type LevelText = (typeof levelText)[LogLevel];
+
+export function parseLevel(text: LogLevel | LevelText): LogLevel {
 	return typeof text == 'string' ? (levelText.indexOf(text) as LogLevel) : text;
 }
 

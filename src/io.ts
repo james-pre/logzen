@@ -1,4 +1,4 @@
-import { levelText, LogLevel } from './levels.js';
+import { levelText, LogLevel, type LevelText } from './levels.js';
 import type { Readable, Writable } from 'stream';
 import type { ReadableStream, WritableStream } from 'stream/web';
 import { Logger } from './logger.js';
@@ -90,6 +90,8 @@ export interface IOInterface<I extends SupportedInterface> {
 	receive?(io: I, handler: (message: IOMessage) => boolean): void;
 }
 
+export type LoggerConsole = Pick<Console, (LevelText & keyof Console) | 'log'>;
+
 /**
  * @internal
  */
@@ -98,7 +100,7 @@ export interface SupportedInterfaces {
 	Writable: Writable;
 	ReadableStream: ReadableStream<string>;
 	WritableStream: WritableStream<string>;
-	Console: Console;
+	Console: LoggerConsole;
 	Logger: Logger;
 }
 
@@ -158,10 +160,8 @@ export const interfaces: { [N in SupportedInterfaceName]: IOInterface<SupportedI
 	Console: {
 		send(io, { computed, level }) {
 			try {
-				const method = levelText[level];
-				if (typeof io[method] == 'function') {
-					io[method](computed);
-				}
+				const method = levelText[level] == 'notice' ? 'log' : levelText[level];
+				if (typeof io[method] == 'function') io[method](computed);
 				return true;
 			} catch (e) {
 				return false;

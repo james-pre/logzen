@@ -1,7 +1,7 @@
 import { EventEmitter } from 'eventemitter3';
 import type { IO, IOInterface, IOMessage, SupportedInterface, SupportedInterfaceName } from './io.js';
 import { interfaces, isIO } from './io.js';
-import { LogLevel, allLogLevels } from './levels.js';
+import { LogLevel, allLogLevels, parseLevel, type LevelText } from './levels.js';
 import { formatMessage, type FormatOptions } from './utils.js';
 
 /**
@@ -57,6 +57,35 @@ export interface LoggerOptions {
 	hideErrorStack: boolean;
 }
 
+/**
+ * The input or output levels for an input or output.
+ * - array			=> the levels to use
+ * - single level	=> the passed level or more severe
+ * - false 			=> no levels
+ * - nullish		=> all levels
+ */
+export type AttachLevels = (LogLevel | LevelText)[] | LogLevel | LevelText | false | null;
+
+export interface IODetachOptions {
+	/** The log levels to use from the i/o input */
+	input?: AttachLevels;
+	/** The log levels to use for output to the i/o */
+	output?: AttachLevels;
+}
+
+export interface IOAttachOptions extends IODetachOptions {
+	prefix?: string;
+}
+
+function parseAttachLevels(levels: AttachLevels, defaultLevels: LogLevel[]): LogLevel[] {
+	if (levels === false) return [];
+	if (!levels) return defaultLevels;
+	if (typeof levels == 'string') return parseAttachLevels(parseLevel(levels), defaultLevels);
+	if (typeof levels == 'number') return allLogLevels.slice(0, levels + 1);
+	if (Array.isArray(levels)) return levels.map(parseLevel);
+	throw new TypeError('Invalid log level: ' + levels);
+}
+
 export class Logger extends EventEmitter<{
 	entry: [data: string, level: LogLevel];
 	send: [data: IOMessage];
@@ -95,23 +124,20 @@ export class Logger extends EventEmitter<{
 	/**
 	 * Attaches an input or output to the Logger
 	 * @param io The interface to attach.
-	 * @param levels The log levels for the i/o.
-	 * @param inputLevels The log levels to use from the i/o
-	 * @param outputLevels The log levels to use from the i/o
+	 * @param opt Options for the I/O
 	 * If log levels are not provided, all log levels will be attached.
 	 */
-	public attach(io: Logger, inputLevels: LogLevel[], outputLevels: LogLevel[], prefix?: string): void;
-	public attach<I extends SupportedInterface>(io: I, levels?: LogLevel[], prefix?: string): void;
+	public attach(io: Logger, opt: IOAttachOptions): void;
+	public attach<I extends SupportedInterface>(io: I, opt?: IOAttachOptions): void;
 	public attach<I extends SupportedInterface>(io: IO<I>): void;
-	public attach<I extends SupportedInterface>(_io: IO<I> | I, inputLevels: LogLevel[] = allLogLevels, outputLevels?: LogLevel[] | string, prefix?: string): void {
-		inputLevels = Array.isArray(inputLevels) ? inputLevels : allLogLevels;
-		outputLevels = Array.isArray(outputLevels) ? outputLevels : inputLevels;
-		prefix = typeof outputLevels == 'string' ? outputLevels : prefix;
+	public attach<I extends SupportedInterface>(_io: IO<I> | I, opt: IOAttachOptions = {}): void {
+		const inputLevels = parseAttachLevels(opt.input, allLogLevels);
+		const outputLevels = parseAttachLevels(opt.output, inputLevels);
 		const io = isIO(_io) ? _io.io : _io;
+
 		const type = ('io' in _io && 'type' in _io ? _io.type : _io instanceof globalThis.console.constructor ? 'Console' : _io.constructor.name) as SupportedInterfaceName;
-		if (!(type in interfaces)) {
-			throw new TypeError('Unsupported I/O: ' + type);
-		}
+		if (!(type in interfaces)) throw new TypeError('Unsupported I/O: ' + type);
+
 		const existing = [...this.io.values()].find(({ io: existing }) => existing == io) as IO<I>;
 		if (existing) {
 			for (const level of inputLevels) {
@@ -120,15 +146,16 @@ export class Logger extends EventEmitter<{
 			for (const level of outputLevels) {
 				existing.output.levels.add(level);
 			}
-			if (prefix) {
-				existing.prefix = prefix;
-			}
+
+			if (opt.prefix) existing.prefix = opt.prefix;
+
 			return;
 		}
+
 		this.io.add({
 			io,
 			type,
-			prefix,
+			prefix: opt.prefix,
 			input: {
 				levels: new Set(inputLevels),
 				enabled: typeof interfaces[type].receive == 'function',
@@ -143,30 +170,29 @@ export class Logger extends EventEmitter<{
 	/**
 	 * Detaches an input or output from the Logger
 	 * @param io The interface to detach.
-	 * @param levels The log levels for the i/o.
-	 * @param inputLevels The log levels to use from the i/o
-	 * @param outputLevels The log levels to use from the i/o
+	 *
 	 * If log levels are not provided, all log levels will be detached.
 	 */
-	public detach(io: Logger, inputLevels: LogLevel[], outputLevels: LogLevel[]): void;
-	public detach<I extends SupportedInterface>(io: I, levels?: LogLevel[]): void;
+	public detach(io: Logger, opt: IODetachOptions): void;
+	public detach<I extends SupportedInterface>(io: I, opt?: IODetachOptions): void;
 	public detach<I extends SupportedInterface>(io: IO<I>): void;
-	public detach<I extends SupportedInterface>(_io: IO<I> | I, inputLevels: LogLevel[] = allLogLevels, outputLevels?: LogLevel[]): void {
-		inputLevels = Array.isArray(inputLevels) ? inputLevels : allLogLevels;
-		outputLevels = Array.isArray(outputLevels) ? outputLevels : inputLevels;
+	public detach<I extends SupportedInterface>(_io: IO<I> | I, opt: IODetachOptions = {}): void {
+		const inputLevels = parseAttachLevels(opt.input, allLogLevels);
+		const outputLevels = parseAttachLevels(opt.output, inputLevels);
+
 		const io = [...this.io.values()].find(({ io: existing }) => existing == (isIO(_io) ? _io.io : _io)) as IO<I>;
-		if (!io) {
-			throw new ReferenceError('I/O not attached to Logger');
-		}
+		if (!io) throw new ReferenceError('I/O not attached to Logger');
+
 		for (const level of inputLevels) {
 			io.input.levels.delete(level);
 		}
+
 		for (const level of outputLevels) {
 			io.output.levels.delete(level);
 		}
-		if (io.input.levels.size > 0 || io.input.levels.size > 0) {
-			return;
-		}
+
+		if (io.input.levels.size > 0 || io.input.levels.size > 0) return;
+
 		this.io.delete(io);
 	}
 
