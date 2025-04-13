@@ -91,6 +91,7 @@ export interface IOInterface<I extends SupportedInterface> {
 }
 
 export interface LoggerConsole {
+	constructor?: { name: string };
 	/** for ERROR */
 	error(message: string): unknown;
 	/** for WARN */
