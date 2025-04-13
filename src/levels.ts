@@ -1,7 +1,7 @@
 /**
  * Enumeration of log levels.
  */
-export const enum LogLevel {
+export enum LogLevel {
 	ERROR = 0,
 	WARN = 1,
 	NOTICE = 2,
@@ -9,7 +9,11 @@ export const enum LogLevel {
 	DEBUG = 4,
 }
 
-export const levelText = ['debug', 'info', 'notice', 'warn', 'error'] as const satisfies { [K in LogLevel]: string };
+export const levelText = ['error', 'warn', 'notice', 'info', 'debug'] as const satisfies { [K in LogLevel]: string };
+
+export function parseLevel(text: LogLevel | (typeof levelText)[LogLevel]): LogLevel {
+	return typeof text == 'string' ? (levelText.indexOf(text) as LogLevel) : text;
+}
 
 /**
  * An array of all the log levels
