@@ -1,5 +1,5 @@
 import type { IOMessage } from './io.js';
-import { levelText, LogLevel } from './levels.js';
+import { levelText } from './levels.js';
 
 /**
  * Helper function to get a formatted time string from a timestamp.
