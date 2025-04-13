@@ -77,7 +77,7 @@ export interface IOAttachOptions extends IODetachOptions {
 	prefix?: string;
 }
 
-function parseAttachLevels(levels: AttachLevels, defaultLevels: LogLevel[]): LogLevel[] {
+export function parseAttachLevels(levels: AttachLevels, defaultLevels: LogLevel[]): LogLevel[] {
 	if (levels === false) return [];
 	if (!levels) return defaultLevels;
 	if (typeof levels == 'string') return parseAttachLevels(parseLevel(levels), defaultLevels);

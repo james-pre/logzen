@@ -1,6 +1,6 @@
-import { levelText, LogLevel, type LevelText } from './levels.js';
 import type { Readable, Writable } from 'stream';
 import type { ReadableStream, WritableStream } from 'stream/web';
+import { levelText, LogLevel } from './levels.js';
 import { Logger } from './logger.js';
 
 /**
@@ -90,7 +90,21 @@ export interface IOInterface<I extends SupportedInterface> {
 	receive?(io: I, handler: (message: IOMessage) => boolean): void;
 }
 
-export type LoggerConsole = Pick<Console, (LevelText & keyof Console) | 'log'>;
+export interface LoggerConsole {
+	/** for ERROR */
+	error(message: string): unknown;
+	/** for WARN */
+	warn(message: string): unknown;
+	/** for NOTICE (yes this is confusing) */
+	info(message: string): unknown;
+	/** for INFO */
+	log(message: string): unknown;
+	/** for DEBUG */
+	debug(message: string): unknown;
+}
+
+/** Map of log level to console method name */
+const loggerConsoleMethods = ['error', 'warn', 'info', 'log', 'debug'] as const;
 
 /**
  * @internal
@@ -160,7 +174,7 @@ export const interfaces: { [N in SupportedInterfaceName]: IOInterface<SupportedI
 	Console: {
 		send(io, { computed, level }) {
 			try {
-				const method = levelText[level] == 'notice' ? 'log' : levelText[level];
+				const method = loggerConsoleMethods[level];
 				if (typeof io[method] == 'function') io[method](computed);
 				return true;
 			} catch (e) {
