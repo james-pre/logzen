@@ -29,7 +29,7 @@ export interface LoggerOptions {
 	/**
 	 * The format to use for log messages
 	 * @see formatMessage
-	 * @default '($time) [$prefix$level] $message'
+	 * @default '(%c) [%p%l] %s'
 	 */
 	format: string;
 
