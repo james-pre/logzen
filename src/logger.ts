@@ -135,7 +135,7 @@ export class Logger extends EventEmitter<{
 		const outputLevels = parseAttachLevels(opt.output, inputLevels);
 		const io = isIO(_io) ? _io.io : _io;
 
-		const type = ('io' in _io && 'type' in _io ? _io.type : _io instanceof globalThis.console.constructor ? 'Console' : _io.constructor.name) as SupportedInterfaceName;
+		const type = ('io' in _io && 'type' in _io ? _io.type : _io instanceof globalThis.console.constructor ? 'Console' : _io.constructor?.name) as SupportedInterfaceName;
 		if (!(type in interfaces)) throw new TypeError('Unsupported I/O: ' + type);
 
 		const existing = [...this.io.values()].find(({ io: existing }) => existing == io) as IO<I>;
