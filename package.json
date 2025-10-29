@@ -1,6 +1,6 @@
 {
 	"name": "logzen",
-	"version": "0.7.1",
+	"version": "0.7.2",
 	"description": "An easy to use utility for logging",
 	"author": "James Prevett <jp@jamespre.dev>",
 	"main": "dist/index.js",
