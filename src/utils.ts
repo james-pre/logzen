@@ -49,5 +49,5 @@ export function formatMessage(message: IOMessage, format = '(%c) [%p%l] %s', { p
 		Y: now.getUTCFullYear().toString().padStart(4, '0'),
 	};
 
-	return format.replaceAll(/%([\w]+)/g, (text, key) => (key in variables ? variables[key] : text));
+	return format.replaceAll(/%([\w]+)/g, (text, key: keyof typeof variables) => (key in variables ? variables[key] : text));
 }

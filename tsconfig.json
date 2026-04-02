@@ -1,16 +1,17 @@
 {
 	"compilerOptions": {
-		"lib": ["ESNext"],
+		"lib": ["ESNext", "DOM"],
 		"module": "NodeNext",
-		"target": "ES2017",
+		"target": "ES2020",
 		"moduleResolution": "NodeNext",
+		"rootDir": "src",
 		"outDir": "dist",
 		"resolveJsonModule": true,
 		"esModuleInterop": true,
 		"noImplicitThis": true,
-		"declaration": true
+		"declaration": true,
+		"types": ["node"]
 	},
-	"files": ["src/index.ts"],
 	"typedocOptions": {
 		"entryPoints": ["src/index.ts"],
 		"out": "docs"

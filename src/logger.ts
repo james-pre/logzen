@@ -77,7 +77,7 @@ export interface IOAttachOptions extends IODetachOptions {
 	prefix?: string;
 }
 
-export function parseAttachLevels(levels: AttachLevels, defaultLevels: LogLevel[]): LogLevel[] {
+export function parseAttachLevels(levels: AttachLevels | undefined, defaultLevels: LogLevel[]): LogLevel[] {
 	if (levels === false) return [];
 	if (!levels) return defaultLevels;
 	if (typeof levels == 'string') return parseAttachLevels(parseLevel(levels), defaultLevels);
@@ -228,6 +228,7 @@ export class Logger extends EventEmitter<{
 				contents: message,
 				level,
 				prefix: this.options.prefix,
+				computed: '',
 			};
 		}
 		message.computed ||= formatMessage(message, this.options.format, this.options.formatOptions);
@@ -245,7 +246,7 @@ export class Logger extends EventEmitter<{
 			}
 
 			const int: IOInterface<SupportedInterface> = interfaces[type];
-			int.send(io, { ...message, prefix });
+			int.send?.(io, { ...message, prefix });
 		}
 		this.emit('send', message);
 		this.emit('entry', message.computed, level);
@@ -299,7 +300,7 @@ export class Logger extends EventEmitter<{
 	 */
 	public warn(data: Error | string): Error {
 		const error = data instanceof Error ? data : new Error(data);
-		const message = this.options.hideWarningStack ? error.toString() : error.stack;
+		const message = this.options.hideWarningStack ? error.toString() : error.stack!;
 		this.send(message, LogLevel.WARN);
 		this.emit('warn', message);
 		return error;
@@ -312,7 +313,7 @@ export class Logger extends EventEmitter<{
 	 */
 	public error(data: Error | string): Error {
 		const error = data instanceof Error ? data : new Error(data);
-		const message = this.options.hideErrorStack ? error.toString() : error.stack;
+		const message = this.options.hideErrorStack ? error.toString() : error.stack!;
 		this.send(message, LogLevel.ERROR);
 		this.emit('error', message);
 		return error;

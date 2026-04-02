@@ -15,12 +15,12 @@ export interface IOMessage {
 	/**
 	 * If the message has already been computed, this will contain the computed message
 	 */
-	computed?: string;
+	computed: string;
 
 	/**
 	 * The log level of the message
 	 */
-	level?: LogLevel;
+	level: LogLevel;
 
 	/**
 	 * The prefix to add to the message
@@ -139,7 +139,7 @@ export const interfaces: { [N in SupportedInterfaceName]: IOInterface<SupportedI
 	Readable: {
 		receive(io, handler) {
 			io.on('data', (data: Buffer | string) => {
-				handler({ contents: data.toString().trim() });
+				handler({ contents: data.toString().trim(), level: LogLevel.INFO, computed: '' });
 			});
 		},
 	},
@@ -159,7 +159,7 @@ export const interfaces: { [N in SupportedInterfaceName]: IOInterface<SupportedI
 			for await (const chunk of io) {
 				data += chunk;
 			}
-			handler({ contents: data });
+			handler({ contents: data, level: LogLevel.INFO, computed: '' });
 		},
 	},
 	WritableStream: {
