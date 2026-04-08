@@ -1,49 +1,57 @@
 {
-	"name": "logzen",
-	"version": "0.7.6",
-	"description": "An easy to use utility for logging",
-	"author": "James Prevett <jp@jamespre.dev>",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"type": "module",
-	"exports": {
-		".": "./dist/index.js",
-		"./*": "./dist/*"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/james-pre/logzen.git"
-	},
-	"keywords": [
-		"log",
-		"logger"
-	],
-	"license": "LGPL-3.0-or-later",
-	"bugs": {
-		"url": "https://github.com/james-pre/logzen/issues"
-	},
-	"homepage": "https://github.com/james-pre/logzen#readme",
-	"scripts": {
-		"format:check": "prettier --check .",
-		"format": "prettier --write .",
-		"lint": "eslint src && tsc --noEmit",
-		"build": "tsc",
-		"build:docs": "typedoc src/index.ts --out docs",
-		"test": "tsx --test",
-		"prepublishOnly": "npm run format && npm run lint && npm run build"
-	},
-	"devDependencies": {
-		"@eslint/js": "^10.0.1",
-		"@types/node": "^22.7.4",
-		"esbuild": "^0.20.2",
-		"eslint": "^10.1.0",
-		"prettier": "^3.0.0",
-		"tsx": "^4.7.2",
-		"typedoc": "^0.28.18",
-		"typescript": "^6.0.2",
-		"typescript-eslint": "^8.58.0"
-	},
-	"dependencies": {
-		"eventemitter3": "^5.0.1"
-	}
+  "name": "logzen",
+  "version": "0.7.6",
+  "description": "An easy to use utility for logging",
+  "author": "James Prevett <jp@jamespre.dev>",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/james-pre/logzen.git"
+  },
+  "keywords": [
+    "log",
+    "logger"
+  ],
+  "license": "LGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/james-pre/logzen/issues"
+  },
+  "homepage": "https://github.com/james-pre/logzen#readme",
+  "scripts": {
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "lint": "eslint src && tsc --noEmit",
+    "build": "tsc",
+    "build:docs": "typedoc src/index.ts --out docs",
+    "test": "tsx --test",
+    "prepublishOnly": "npm run format && npm run lint && npm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.7.4",
+    "esbuild": "^0.20.2",
+    "eslint": "^10.1.0",
+    "prettier": "^3.0.0",
+    "tsx": "^4.7.2",
+    "typedoc": "^0.28.18",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.58.0"
+  },
+  "dependencies": {
+    "eventemitter3": "^5.0.1"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "useTabs": true,
+    "trailingComma": "es5",
+    "tabWidth": 4,
+    "printWidth": 180,
+    "arrowParens": "avoid"
+  }
 }
