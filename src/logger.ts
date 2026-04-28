@@ -289,7 +289,7 @@ export class Logger extends EventEmitter<{
 	 * @param data - The log message.
 	 */
 	public notice(...data: string[]): void {
-		this.send(data.join(' '), LogLevel.INFO);
+		this.send(data.join(' '), LogLevel.NOTICE);
 		this.emit('notice', data.join(' '));
 	}
 

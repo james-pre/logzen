@@ -45,7 +45,7 @@ suite('Logger', () => {
 		const contents = 'Test log message';
 		logger.send(contents, LogLevel.INFO);
 
-		const expected = formatMessage({ contents, level: LogLevel.INFO });
+		const expected = formatMessage({ contents, level: LogLevel.INFO, computed: '' });
 
 		assert.equal(mockIO.io.write.mock.calls[0].arguments[0], expected);
 		assert(logger.entries.includes(expected));
@@ -63,7 +63,7 @@ suite('Logger', () => {
 
 		logger.attach(mockIO as unknown as IO<Writable>);
 
-		const message = { contents: 'Test log message', level: LogLevel.INFO, prefix: 'PREFIX' };
+		const message = { contents: 'Test log message', level: LogLevel.INFO, prefix: 'PREFIX', computed: '' };
 
 		// Test sending log messages with a prefix
 		logger.send(message);
@@ -88,7 +88,7 @@ suite('Logger', () => {
 		logger.send(contents, LogLevel.INFO);
 
 		// Validate that the log message was received by the receiver logger
-		const expected = formatMessage({ contents, level: LogLevel.INFO });
+		const expected = formatMessage({ contents, level: LogLevel.INFO, computed: '' });
 		assert(receiverLogger.entries.includes(expected));
 	});
 
@@ -107,19 +107,19 @@ suite('Logger', () => {
 		const contents = 'Test log message';
 
 		logger.info(contents);
-		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.INFO })));
+		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.INFO, computed: '' })));
 
 		logger.notice(contents);
-		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.NOTICE })));
+		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.NOTICE, computed: '' })));
 
 		const errorContents = new Error(contents);
 		logger.warn(errorContents);
-		assert(logger.entries.includes(formatMessage({ contents: errorContents.toString(), level: LogLevel.WARN })));
+		assert(logger.entries.includes(formatMessage({ contents: errorContents.toString(), level: LogLevel.WARN, computed: '' })));
 
 		logger.error(errorContents);
-		assert(logger.entries.includes(formatMessage({ contents: errorContents.toString(), level: LogLevel.ERROR })));
+		assert(logger.entries.includes(formatMessage({ contents: errorContents.toString(), level: LogLevel.ERROR, computed: '' })));
 
 		logger.debug(contents);
-		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.DEBUG })));
+		assert(logger.entries.includes(formatMessage({ contents, level: LogLevel.DEBUG, computed: '' })));
 	});
 });
